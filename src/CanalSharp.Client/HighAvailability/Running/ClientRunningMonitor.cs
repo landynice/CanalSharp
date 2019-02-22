@@ -14,14 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Net;
+using CanalSharp.Common;
 
-namespace CanalSharp.Client
+namespace CanalSharp.Client.HighAvailability.Running
 {
-    public interface ICanalNodeAccessStrategy
+    public class ClientRunningMonitor : AbstractCanalLifeCycle
     {
-        SocketAddress CurrentNode();
-
-        SocketAddress NextNode();
     }
 }

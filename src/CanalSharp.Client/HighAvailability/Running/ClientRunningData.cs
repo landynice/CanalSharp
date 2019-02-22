@@ -14,24 +14,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Net;
-
-namespace CanalSharp.Client.Impl.Running
+namespace CanalSharp.Client.HighAvailability.Running
 {
     /// <summary>
-    /// 触发一下mainstem发生切换
+    /// client running状态信息
     /// </summary>
-    public interface IClientRunningListener
+    public class ClientRunningData
     {
-        /// <summary>
-        /// 触发现在轮到自己做为active，需要载入上一个active的上下文数据
-        /// </summary>
-        /// <returns></returns>
-        SocketAddress ProcessActiveEnter();
+        private short ClientId { get; set; }
 
-        /// <summary>
-        /// 触发一下当前active模式失败
-        /// </summary>
-        void ProcessActiveExit();
+        public string Address { get; }
+
+        public bool Active { get; } = true;
+
+        public bool IsActive()
+        {
+            return Active;
+        }
     }
 }

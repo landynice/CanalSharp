@@ -14,9 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CanalSharp.Client.Impl
+using CanalSharp.Client.Connector;
+
+namespace CanalSharp.Client
 {
-    public class CanalConnectors
+    public class CanalConnectorFactory
     {
         /// <summary>
         /// 创建单链接的客户端链接
@@ -26,10 +28,10 @@ namespace CanalSharp.Client.Impl
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public static ICanalConnector NewSingleConnector(string address, int port, string destination, string username,
+        public static ICanalConnector CreateSingleConnector(string address, int port, string destination, string username,
             string password)
         {
-            var canalConnector = new SimpleCanalConnector(address, port, username, password, destination)
+            var canalConnector = new SingleCanalConnector(address, port, username, password, destination)
             {
                 SoTimeOut = 60 * 1000,
                 IdleTimeOut = 60 * 60 * 1000

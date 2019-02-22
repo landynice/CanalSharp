@@ -16,7 +16,7 @@
 
 using CanalSharp.Protocol;
 
-namespace CanalSharp.Client
+namespace CanalSharp.Client.Connector
 {
     public interface ICanalConnector
     {

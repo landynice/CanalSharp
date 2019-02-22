@@ -22,16 +22,15 @@ using System.Net.Sockets;
 using CanalSharp.Common.Logging;
 using CanalSharp.Protocol;
 using CanalSharp.Protocol.Exception;
-using Com.Alibaba.Otter.Canal.Protocol;
 using DotNetty.Transport.Channels;
 using Google.Protobuf;
 using Microsoft.Extensions.Logging;
 
-namespace CanalSharp.Client.Impl
+namespace CanalSharp.Client.Connector
 {
-    public class SimpleCanalConnector : ChannelHandlerAdapter, ICanalConnector
+    public class SingleCanalConnector : ChannelHandlerAdapter, ICanalConnector
     {
-        private readonly ILogger _logger = CanalSharpLogManager.LoggerFactory.CreateLogger<SimpleCanalConnector>();
+        private readonly ILogger _logger = CanalSharpLogManager.LoggerFactory.CreateLogger<SingleCanalConnector>();
 
         private readonly ClientIdentity _clientIdentity;
 
@@ -85,17 +84,17 @@ namespace CanalSharp.Client.Impl
         /// </summary>
         public int IdleTimeOut { get; set; } = 60 * 60 * 1000;
 
-        public SimpleCanalConnector(string address, int port, string username, string password, string destination) :
+        public SingleCanalConnector(string address, int port, string username, string password, string destination) :
             this(address, port, username, password, destination, 60000, 60 * 60 * 1000)
         {
         }
 
-        public SimpleCanalConnector(string address, int port, string username, string password, string destination,
+        public SingleCanalConnector(string address, int port, string username, string password, string destination,
             int soTimeout) : this(address, port, username, password, destination, soTimeout, 60 * 60 * 1000)
         {
         }
 
-        public SimpleCanalConnector(string address, int port, string username, string password, string destination,
+        public SingleCanalConnector(string address, int port, string username, string password, string destination,
             int soTimeout, int idleTimeout)
         {
             Address = address;
@@ -189,7 +188,7 @@ namespace CanalSharp.Client.Impl
                 WriteWithHeader(pack);
 
                 var p = Packet.Parser.ParseFrom(ReadNextPacket());
-                var ack = Com.Alibaba.Otter.Canal.Protocol.Ack.Parser.ParseFrom(p.Body);
+                var ack = Protocol.Ack.Parser.ParseFrom(p.Body);
                 if (ack.ErrorCode > 0)
                 {
                     throw new CanalClientException($"failed to subscribe with reason: {ack.ErrorMessage}");
@@ -232,7 +231,7 @@ namespace CanalSharp.Client.Impl
                 }.ToByteArray();
                 WriteWithHeader(pack);
                 var p = Packet.Parser.ParseFrom(ReadNextPacket());
-                var ack = Com.Alibaba.Otter.Canal.Protocol.Ack.Parser.ParseFrom(p.Body);
+                var ack = Protocol.Ack.Parser.ParseFrom(p.Body);
                 if (ack.ErrorCode > 0)
                 {
                     throw new CanalClientException($"failed to unSubscribe with reason: {ack.ErrorMessage}");
@@ -330,7 +329,7 @@ namespace CanalSharp.Client.Impl
                 }
                 case PacketType.Ack:
                 {
-                    var ack = Com.Alibaba.Otter.Canal.Protocol.Ack.Parser.ParseFrom(p.Body);
+                    var ack = Protocol.Ack.Parser.ParseFrom(p.Body);
                     throw new CanalClientException($"something goes wrong with reason:{ack.ErrorMessage}");
                 }
                 default:
@@ -451,7 +450,7 @@ namespace CanalSharp.Client.Impl
                     throw new CanalClientException("unexpected packet type when ack is expected");
                 }
 
-                var ackBody = Com.Alibaba.Otter.Canal.Protocol.Ack.Parser.ParseFrom(p.Body);
+                var ackBody = Protocol.Ack.Parser.ParseFrom(p.Body);
                 if (ackBody.ErrorCode > 0)
                 {
                     throw new CanalClientException("something goes wrong when doing authentication:" +

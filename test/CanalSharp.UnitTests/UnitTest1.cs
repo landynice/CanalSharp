@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using CanalSharp.Client;
-using CanalSharp.Client.Impl;
+using CanalSharp.Client.Connector;
 using Xunit;
 
 namespace CanalSharp.UnitTests
@@ -14,7 +14,7 @@ namespace CanalSharp.UnitTests
         public void Test1()
         {
             string destination = "example";
-            ICanalConnector connector = CanalConnectors.NewSingleConnector("127.0.0.1", 11111, destination, "", "");
+            ICanalConnector connector = CanalConnectorFactory.CreateSingleConnector("127.0.0.1", 11111, destination, "", "");
             connector.Connect();
             Console.Read();
 

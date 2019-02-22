@@ -8,8 +8,8 @@
 using pb = global::Google.Protobuf;
 using pbc = global::Google.Protobuf.Collections;
 using pbr = global::Google.Protobuf.Reflection;
-using scg = global::System.Collections.Generic;
-namespace Com.Alibaba.Otter.Canal.Protocol {
+
+namespace CanalSharp.Protocol {
 
   /// <summary>Holder for reflection information generated from EntryProtocol.proto</summary>
   public static partial class EntryProtocolReflection {
@@ -75,15 +75,15 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
             "cHJvdG9jb2xCCkNhbmFsRW50cnlIAWIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
-          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Com.Alibaba.Otter.Canal.Protocol.EntryType), typeof(global::Com.Alibaba.Otter.Canal.Protocol.EventType), typeof(global::Com.Alibaba.Otter.Canal.Protocol.Type), }, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Alibaba.Otter.Canal.Protocol.Entry), global::Com.Alibaba.Otter.Canal.Protocol.Entry.Parser, new[]{ "Header", "EntryType", "StoreValue" }, new[]{ "EntryTypePresent" }, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Alibaba.Otter.Canal.Protocol.Header), global::Com.Alibaba.Otter.Canal.Protocol.Header.Parser, new[]{ "Version", "LogfileName", "LogfileOffset", "ServerId", "ServerenCode", "ExecuteTime", "SourceType", "SchemaName", "TableName", "EventLength", "EventType", "Props", "Gtid" }, new[]{ "VersionPresent", "SourceTypePresent", "EventTypePresent" }, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Alibaba.Otter.Canal.Protocol.Column), global::Com.Alibaba.Otter.Canal.Protocol.Column.Parser, new[]{ "Index", "SqlType", "Name", "IsKey", "Updated", "IsNull", "Props", "Value", "Length", "MysqlType" }, new[]{ "IsNullPresent" }, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Alibaba.Otter.Canal.Protocol.RowData), global::Com.Alibaba.Otter.Canal.Protocol.RowData.Parser, new[]{ "BeforeColumns", "AfterColumns", "Props" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Alibaba.Otter.Canal.Protocol.RowChange), global::Com.Alibaba.Otter.Canal.Protocol.RowChange.Parser, new[]{ "TableId", "EventType", "IsDdl", "Sql", "RowDatas", "Props", "DdlSchemaName" }, new[]{ "EventTypePresent", "IsDdlPresent" }, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Alibaba.Otter.Canal.Protocol.TransactionBegin), global::Com.Alibaba.Otter.Canal.Protocol.TransactionBegin.Parser, new[]{ "ExecuteTime", "TransactionId", "Props", "ThreadId" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Alibaba.Otter.Canal.Protocol.TransactionEnd), global::Com.Alibaba.Otter.Canal.Protocol.TransactionEnd.Parser, new[]{ "ExecuteTime", "TransactionId", "Props" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Alibaba.Otter.Canal.Protocol.Pair), global::Com.Alibaba.Otter.Canal.Protocol.Pair.Parser, new[]{ "Key", "Value" }, null, null, null)
+          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::CanalSharp.Protocol.EntryType), typeof(global::CanalSharp.Protocol.EventType), typeof(global::CanalSharp.Protocol.Type), }, new pbr::GeneratedClrTypeInfo[] {
+            new pbr::GeneratedClrTypeInfo(typeof(global::CanalSharp.Protocol.Entry), global::CanalSharp.Protocol.Entry.Parser, new[]{ "Header", "EntryType", "StoreValue" }, new[]{ "EntryTypePresent" }, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::CanalSharp.Protocol.Header), global::CanalSharp.Protocol.Header.Parser, new[]{ "Version", "LogfileName", "LogfileOffset", "ServerId", "ServerenCode", "ExecuteTime", "SourceType", "SchemaName", "TableName", "EventLength", "EventType", "Props", "Gtid" }, new[]{ "VersionPresent", "SourceTypePresent", "EventTypePresent" }, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::CanalSharp.Protocol.Column), global::CanalSharp.Protocol.Column.Parser, new[]{ "Index", "SqlType", "Name", "IsKey", "Updated", "IsNull", "Props", "Value", "Length", "MysqlType" }, new[]{ "IsNullPresent" }, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::CanalSharp.Protocol.RowData), global::CanalSharp.Protocol.RowData.Parser, new[]{ "BeforeColumns", "AfterColumns", "Props" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::CanalSharp.Protocol.RowChange), global::CanalSharp.Protocol.RowChange.Parser, new[]{ "TableId", "EventType", "IsDdl", "Sql", "RowDatas", "Props", "DdlSchemaName" }, new[]{ "EventTypePresent", "IsDdlPresent" }, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::CanalSharp.Protocol.TransactionBegin), global::CanalSharp.Protocol.TransactionBegin.Parser, new[]{ "ExecuteTime", "TransactionId", "Props", "ThreadId" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::CanalSharp.Protocol.TransactionEnd), global::CanalSharp.Protocol.TransactionEnd.Parser, new[]{ "ExecuteTime", "TransactionId", "Props" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::CanalSharp.Protocol.Pair), global::CanalSharp.Protocol.Pair.Parser, new[]{ "Key", "Value" }, null, null, null)
           }));
     }
     #endregion
@@ -163,7 +163,7 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Alibaba.Otter.Canal.Protocol.EntryProtocolReflection.Descriptor.MessageTypes[0]; }
+      get { return global::CanalSharp.Protocol.EntryProtocolReflection.Descriptor.MessageTypes[0]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -198,12 +198,12 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     /// <summary>Field number for the "header" field.</summary>
     public const int HeaderFieldNumber = 1;
-    private global::Com.Alibaba.Otter.Canal.Protocol.Header header_;
+    private global::CanalSharp.Protocol.Header header_;
     /// <summary>
     ///*协议头部信息*
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Com.Alibaba.Otter.Canal.Protocol.Header Header {
+    public global::CanalSharp.Protocol.Header Header {
       get { return header_; }
       set {
         header_ = value;
@@ -213,8 +213,8 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
     /// <summary>Field number for the "entryType" field.</summary>
     public const int EntryTypeFieldNumber = 2;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Com.Alibaba.Otter.Canal.Protocol.EntryType EntryType {
-      get { return entryTypePresentCase_ == EntryTypePresentOneofCase.EntryType ? (global::Com.Alibaba.Otter.Canal.Protocol.EntryType) entryTypePresent_ : EntryType.Rowdata; }
+    public global::CanalSharp.Protocol.EntryType EntryType {
+      get { return entryTypePresentCase_ == EntryTypePresentOneofCase.EntryType ? (global::CanalSharp.Protocol.EntryType) entryTypePresent_ : EntryType.Rowdata; }
       set {
         entryTypePresent_ = value;
         entryTypePresentCase_ = EntryTypePresentOneofCase.EntryType;
@@ -335,7 +335,7 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
       }
       if (other.header_ != null) {
         if (header_ == null) {
-          header_ = new global::Com.Alibaba.Otter.Canal.Protocol.Header();
+          header_ = new global::CanalSharp.Protocol.Header();
         }
         Header.MergeFrom(other.Header);
       }
@@ -361,7 +361,7 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
             break;
           case 10: {
             if (header_ == null) {
-              header_ = new global::Com.Alibaba.Otter.Canal.Protocol.Header();
+              header_ = new global::CanalSharp.Protocol.Header();
             }
             input.ReadMessage(header_);
             break;
@@ -392,7 +392,7 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Alibaba.Otter.Canal.Protocol.EntryProtocolReflection.Descriptor.MessageTypes[1]; }
+      get { return global::CanalSharp.Protocol.EntryProtocolReflection.Descriptor.MessageTypes[1]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -529,8 +529,8 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
     /// <summary>Field number for the "sourceType" field.</summary>
     public const int SourceTypeFieldNumber = 7;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Com.Alibaba.Otter.Canal.Protocol.Type SourceType {
-      get { return sourceTypePresentCase_ == SourceTypePresentOneofCase.SourceType ? (global::Com.Alibaba.Otter.Canal.Protocol.Type) sourceTypePresent_ : Type.Mysql; }
+    public global::CanalSharp.Protocol.Type SourceType {
+      get { return sourceTypePresentCase_ == SourceTypePresentOneofCase.SourceType ? (global::CanalSharp.Protocol.Type) sourceTypePresent_ : Type.Mysql; }
       set {
         sourceTypePresent_ = value;
         sourceTypePresentCase_ = SourceTypePresentOneofCase.SourceType;
@@ -582,8 +582,8 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
     /// <summary>Field number for the "eventType" field.</summary>
     public const int EventTypeFieldNumber = 11;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Com.Alibaba.Otter.Canal.Protocol.EventType EventType {
-      get { return eventTypePresentCase_ == EventTypePresentOneofCase.EventType ? (global::Com.Alibaba.Otter.Canal.Protocol.EventType) eventTypePresent_ : EventType.Update; }
+    public global::CanalSharp.Protocol.EventType EventType {
+      get { return eventTypePresentCase_ == EventTypePresentOneofCase.EventType ? (global::CanalSharp.Protocol.EventType) eventTypePresent_ : EventType.Update; }
       set {
         eventTypePresent_ = value;
         eventTypePresentCase_ = EventTypePresentOneofCase.EventType;
@@ -592,14 +592,14 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     /// <summary>Field number for the "props" field.</summary>
     public const int PropsFieldNumber = 12;
-    private static readonly pb::FieldCodec<global::Com.Alibaba.Otter.Canal.Protocol.Pair> _repeated_props_codec
-        = pb::FieldCodec.ForMessage(98, global::Com.Alibaba.Otter.Canal.Protocol.Pair.Parser);
-    private readonly pbc::RepeatedField<global::Com.Alibaba.Otter.Canal.Protocol.Pair> props_ = new pbc::RepeatedField<global::Com.Alibaba.Otter.Canal.Protocol.Pair>();
+    private static readonly pb::FieldCodec<global::CanalSharp.Protocol.Pair> _repeated_props_codec
+        = pb::FieldCodec.ForMessage(98, global::CanalSharp.Protocol.Pair.Parser);
+    private readonly pbc::RepeatedField<global::CanalSharp.Protocol.Pair> props_ = new pbc::RepeatedField<global::CanalSharp.Protocol.Pair>();
     /// <summary>
     ///*预留扩展*
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public pbc::RepeatedField<global::Com.Alibaba.Otter.Canal.Protocol.Pair> Props {
+    public pbc::RepeatedField<global::CanalSharp.Protocol.Pair> Props {
       get { return props_; }
     }
 
@@ -968,7 +968,7 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Alibaba.Otter.Canal.Protocol.EntryProtocolReflection.Descriptor.MessageTypes[2]; }
+      get { return global::CanalSharp.Protocol.EntryProtocolReflection.Descriptor.MessageTypes[2]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1091,14 +1091,14 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     /// <summary>Field number for the "props" field.</summary>
     public const int PropsFieldNumber = 7;
-    private static readonly pb::FieldCodec<global::Com.Alibaba.Otter.Canal.Protocol.Pair> _repeated_props_codec
-        = pb::FieldCodec.ForMessage(58, global::Com.Alibaba.Otter.Canal.Protocol.Pair.Parser);
-    private readonly pbc::RepeatedField<global::Com.Alibaba.Otter.Canal.Protocol.Pair> props_ = new pbc::RepeatedField<global::Com.Alibaba.Otter.Canal.Protocol.Pair>();
+    private static readonly pb::FieldCodec<global::CanalSharp.Protocol.Pair> _repeated_props_codec
+        = pb::FieldCodec.ForMessage(58, global::CanalSharp.Protocol.Pair.Parser);
+    private readonly pbc::RepeatedField<global::CanalSharp.Protocol.Pair> props_ = new pbc::RepeatedField<global::CanalSharp.Protocol.Pair>();
     /// <summary>
     ///*预留扩展*
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public pbc::RepeatedField<global::Com.Alibaba.Otter.Canal.Protocol.Pair> Props {
+    public pbc::RepeatedField<global::CanalSharp.Protocol.Pair> Props {
       get { return props_; }
     }
 
@@ -1396,7 +1396,7 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Alibaba.Otter.Canal.Protocol.EntryProtocolReflection.Descriptor.MessageTypes[3]; }
+      get { return global::CanalSharp.Protocol.EntryProtocolReflection.Descriptor.MessageTypes[3]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1426,40 +1426,40 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     /// <summary>Field number for the "beforeColumns" field.</summary>
     public const int BeforeColumnsFieldNumber = 1;
-    private static readonly pb::FieldCodec<global::Com.Alibaba.Otter.Canal.Protocol.Column> _repeated_beforeColumns_codec
-        = pb::FieldCodec.ForMessage(10, global::Com.Alibaba.Otter.Canal.Protocol.Column.Parser);
-    private readonly pbc::RepeatedField<global::Com.Alibaba.Otter.Canal.Protocol.Column> beforeColumns_ = new pbc::RepeatedField<global::Com.Alibaba.Otter.Canal.Protocol.Column>();
+    private static readonly pb::FieldCodec<global::CanalSharp.Protocol.Column> _repeated_beforeColumns_codec
+        = pb::FieldCodec.ForMessage(10, global::CanalSharp.Protocol.Column.Parser);
+    private readonly pbc::RepeatedField<global::CanalSharp.Protocol.Column> beforeColumns_ = new pbc::RepeatedField<global::CanalSharp.Protocol.Column>();
     /// <summary>
     ///* 字段信息，增量数据(修改前,删除前) *
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public pbc::RepeatedField<global::Com.Alibaba.Otter.Canal.Protocol.Column> BeforeColumns {
+    public pbc::RepeatedField<global::CanalSharp.Protocol.Column> BeforeColumns {
       get { return beforeColumns_; }
     }
 
     /// <summary>Field number for the "afterColumns" field.</summary>
     public const int AfterColumnsFieldNumber = 2;
-    private static readonly pb::FieldCodec<global::Com.Alibaba.Otter.Canal.Protocol.Column> _repeated_afterColumns_codec
-        = pb::FieldCodec.ForMessage(18, global::Com.Alibaba.Otter.Canal.Protocol.Column.Parser);
-    private readonly pbc::RepeatedField<global::Com.Alibaba.Otter.Canal.Protocol.Column> afterColumns_ = new pbc::RepeatedField<global::Com.Alibaba.Otter.Canal.Protocol.Column>();
+    private static readonly pb::FieldCodec<global::CanalSharp.Protocol.Column> _repeated_afterColumns_codec
+        = pb::FieldCodec.ForMessage(18, global::CanalSharp.Protocol.Column.Parser);
+    private readonly pbc::RepeatedField<global::CanalSharp.Protocol.Column> afterColumns_ = new pbc::RepeatedField<global::CanalSharp.Protocol.Column>();
     /// <summary>
     ///* 字段信息，增量数据(修改后,新增后)  *
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public pbc::RepeatedField<global::Com.Alibaba.Otter.Canal.Protocol.Column> AfterColumns {
+    public pbc::RepeatedField<global::CanalSharp.Protocol.Column> AfterColumns {
       get { return afterColumns_; }
     }
 
     /// <summary>Field number for the "props" field.</summary>
     public const int PropsFieldNumber = 3;
-    private static readonly pb::FieldCodec<global::Com.Alibaba.Otter.Canal.Protocol.Pair> _repeated_props_codec
-        = pb::FieldCodec.ForMessage(26, global::Com.Alibaba.Otter.Canal.Protocol.Pair.Parser);
-    private readonly pbc::RepeatedField<global::Com.Alibaba.Otter.Canal.Protocol.Pair> props_ = new pbc::RepeatedField<global::Com.Alibaba.Otter.Canal.Protocol.Pair>();
+    private static readonly pb::FieldCodec<global::CanalSharp.Protocol.Pair> _repeated_props_codec
+        = pb::FieldCodec.ForMessage(26, global::CanalSharp.Protocol.Pair.Parser);
+    private readonly pbc::RepeatedField<global::CanalSharp.Protocol.Pair> props_ = new pbc::RepeatedField<global::CanalSharp.Protocol.Pair>();
     /// <summary>
     ///*预留扩展*
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public pbc::RepeatedField<global::Com.Alibaba.Otter.Canal.Protocol.Pair> Props {
+    public pbc::RepeatedField<global::CanalSharp.Protocol.Pair> Props {
       get { return props_; }
     }
 
@@ -1569,7 +1569,7 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Alibaba.Otter.Canal.Protocol.EntryProtocolReflection.Descriptor.MessageTypes[4]; }
+      get { return global::CanalSharp.Protocol.EntryProtocolReflection.Descriptor.MessageTypes[4]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1628,8 +1628,8 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
     /// <summary>Field number for the "eventType" field.</summary>
     public const int EventTypeFieldNumber = 2;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Com.Alibaba.Otter.Canal.Protocol.EventType EventType {
-      get { return eventTypePresentCase_ == EventTypePresentOneofCase.EventType ? (global::Com.Alibaba.Otter.Canal.Protocol.EventType) eventTypePresent_ : EventType.Update; }
+    public global::CanalSharp.Protocol.EventType EventType {
+      get { return eventTypePresentCase_ == EventTypePresentOneofCase.EventType ? (global::CanalSharp.Protocol.EventType) eventTypePresent_ : EventType.Update; }
       set {
         eventTypePresent_ = value;
         eventTypePresentCase_ = EventTypePresentOneofCase.EventType;
@@ -1663,27 +1663,27 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     /// <summary>Field number for the "rowDatas" field.</summary>
     public const int RowDatasFieldNumber = 12;
-    private static readonly pb::FieldCodec<global::Com.Alibaba.Otter.Canal.Protocol.RowData> _repeated_rowDatas_codec
-        = pb::FieldCodec.ForMessage(98, global::Com.Alibaba.Otter.Canal.Protocol.RowData.Parser);
-    private readonly pbc::RepeatedField<global::Com.Alibaba.Otter.Canal.Protocol.RowData> rowDatas_ = new pbc::RepeatedField<global::Com.Alibaba.Otter.Canal.Protocol.RowData>();
+    private static readonly pb::FieldCodec<global::CanalSharp.Protocol.RowData> _repeated_rowDatas_codec
+        = pb::FieldCodec.ForMessage(98, global::CanalSharp.Protocol.RowData.Parser);
+    private readonly pbc::RepeatedField<global::CanalSharp.Protocol.RowData> rowDatas_ = new pbc::RepeatedField<global::CanalSharp.Protocol.RowData>();
     /// <summary>
     ///* 一次数据库变更可能存在多行  *
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public pbc::RepeatedField<global::Com.Alibaba.Otter.Canal.Protocol.RowData> RowDatas {
+    public pbc::RepeatedField<global::CanalSharp.Protocol.RowData> RowDatas {
       get { return rowDatas_; }
     }
 
     /// <summary>Field number for the "props" field.</summary>
     public const int PropsFieldNumber = 13;
-    private static readonly pb::FieldCodec<global::Com.Alibaba.Otter.Canal.Protocol.Pair> _repeated_props_codec
-        = pb::FieldCodec.ForMessage(106, global::Com.Alibaba.Otter.Canal.Protocol.Pair.Parser);
-    private readonly pbc::RepeatedField<global::Com.Alibaba.Otter.Canal.Protocol.Pair> props_ = new pbc::RepeatedField<global::Com.Alibaba.Otter.Canal.Protocol.Pair>();
+    private static readonly pb::FieldCodec<global::CanalSharp.Protocol.Pair> _repeated_props_codec
+        = pb::FieldCodec.ForMessage(106, global::CanalSharp.Protocol.Pair.Parser);
+    private readonly pbc::RepeatedField<global::CanalSharp.Protocol.Pair> props_ = new pbc::RepeatedField<global::CanalSharp.Protocol.Pair>();
     /// <summary>
     ///*预留扩展*
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public pbc::RepeatedField<global::Com.Alibaba.Otter.Canal.Protocol.Pair> Props {
+    public pbc::RepeatedField<global::CanalSharp.Protocol.Pair> Props {
       get { return props_; }
     }
 
@@ -1925,7 +1925,7 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Alibaba.Otter.Canal.Protocol.EntryProtocolReflection.Descriptor.MessageTypes[5]; }
+      get { return global::CanalSharp.Protocol.EntryProtocolReflection.Descriptor.MessageTypes[5]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1984,14 +1984,14 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     /// <summary>Field number for the "props" field.</summary>
     public const int PropsFieldNumber = 3;
-    private static readonly pb::FieldCodec<global::Com.Alibaba.Otter.Canal.Protocol.Pair> _repeated_props_codec
-        = pb::FieldCodec.ForMessage(26, global::Com.Alibaba.Otter.Canal.Protocol.Pair.Parser);
-    private readonly pbc::RepeatedField<global::Com.Alibaba.Otter.Canal.Protocol.Pair> props_ = new pbc::RepeatedField<global::Com.Alibaba.Otter.Canal.Protocol.Pair>();
+    private static readonly pb::FieldCodec<global::CanalSharp.Protocol.Pair> _repeated_props_codec
+        = pb::FieldCodec.ForMessage(26, global::CanalSharp.Protocol.Pair.Parser);
+    private readonly pbc::RepeatedField<global::CanalSharp.Protocol.Pair> props_ = new pbc::RepeatedField<global::CanalSharp.Protocol.Pair>();
     /// <summary>
     ///*预留扩展*
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public pbc::RepeatedField<global::Com.Alibaba.Otter.Canal.Protocol.Pair> Props {
+    public pbc::RepeatedField<global::CanalSharp.Protocol.Pair> Props {
       get { return props_; }
     }
 
@@ -2145,7 +2145,7 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Alibaba.Otter.Canal.Protocol.EntryProtocolReflection.Descriptor.MessageTypes[6]; }
+      get { return global::CanalSharp.Protocol.EntryProtocolReflection.Descriptor.MessageTypes[6]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2203,14 +2203,14 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     /// <summary>Field number for the "props" field.</summary>
     public const int PropsFieldNumber = 3;
-    private static readonly pb::FieldCodec<global::Com.Alibaba.Otter.Canal.Protocol.Pair> _repeated_props_codec
-        = pb::FieldCodec.ForMessage(26, global::Com.Alibaba.Otter.Canal.Protocol.Pair.Parser);
-    private readonly pbc::RepeatedField<global::Com.Alibaba.Otter.Canal.Protocol.Pair> props_ = new pbc::RepeatedField<global::Com.Alibaba.Otter.Canal.Protocol.Pair>();
+    private static readonly pb::FieldCodec<global::CanalSharp.Protocol.Pair> _repeated_props_codec
+        = pb::FieldCodec.ForMessage(26, global::CanalSharp.Protocol.Pair.Parser);
+    private readonly pbc::RepeatedField<global::CanalSharp.Protocol.Pair> props_ = new pbc::RepeatedField<global::CanalSharp.Protocol.Pair>();
     /// <summary>
     ///*预留扩展*
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public pbc::RepeatedField<global::Com.Alibaba.Otter.Canal.Protocol.Pair> Props {
+    public pbc::RepeatedField<global::CanalSharp.Protocol.Pair> Props {
       get { return props_; }
     }
 
@@ -2334,7 +2334,7 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Alibaba.Otter.Canal.Protocol.EntryProtocolReflection.Descriptor.MessageTypes[7]; }
+      get { return global::CanalSharp.Protocol.EntryProtocolReflection.Descriptor.MessageTypes[7]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using CanalSharp.Client.Impl;
+using CanalSharp.Client;
 using CanalSharp.Common.Logging;
-using Com.Alibaba.Otter.Canal.Protocol;
+using CanalSharp.Protocol;
 using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Config;
@@ -27,7 +27,7 @@ namespace CanalSharp.SimpleClient
             //canal 配置的 destination，默认为 example
             var destination = "example";
             //创建一个简单 CanalClient 连接对象（此对象不支持集群）传入参数分别为 canal 地址、端口、destination、用户名、密码
-            var connector = CanalConnectors.NewSingleConnector("127.0.0.1", 11111, destination, "", "");
+            var connector = CanalConnectorFactory.CreateSingleConnector("127.0.0.1", 11111, destination, "", "");
             //连接 Canal
             connector.Connect();
             //订阅，同时传入 Filter。Filter是一种过滤规则，通过该规则的表数据变更才会传递过来

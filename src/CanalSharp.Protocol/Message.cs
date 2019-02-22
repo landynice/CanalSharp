@@ -16,7 +16,6 @@
 
 using System;
 using System.Collections.Generic;
-using Com.Alibaba.Otter.Canal.Protocol;
 using Google.Protobuf;
 
 namespace CanalSharp.Protocol

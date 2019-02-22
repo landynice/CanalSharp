@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 
-namespace CanalSharp.Client.Impl
+namespace CanalSharp.Client.HighAvailability
 {
     /// <summary>
     /// 简单版本的 node 访问实现

@@ -9,8 +9,8 @@ using System.Text;
 using pb = global::Google.Protobuf;
 using pbc = global::Google.Protobuf.Collections;
 using pbr = global::Google.Protobuf.Reflection;
-using scg = global::System.Collections.Generic;
-namespace Com.Alibaba.Otter.Canal.Protocol {
+
+namespace CanalSharp.Protocol {
 
   /// <summary>Holder for reflection information generated from CanalProtocol.proto</summary>
   public static partial class CanalProtocolReflection {
@@ -68,19 +68,19 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
             "dHRlci5jYW5hbC5wcm90b2NvbEILQ2FuYWxQYWNrZXRIAWIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
-          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Com.Alibaba.Otter.Canal.Protocol.Compression), typeof(global::Com.Alibaba.Otter.Canal.Protocol.PacketType), }, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Alibaba.Otter.Canal.Protocol.Packet), global::Com.Alibaba.Otter.Canal.Protocol.Packet.Parser, new[]{ "MagicNumber", "Version", "Type", "Compression", "Body" }, new[]{ "MagicNumberPresent", "VersionPresent", "CompressionPresent" }, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Alibaba.Otter.Canal.Protocol.HeartBeat), global::Com.Alibaba.Otter.Canal.Protocol.HeartBeat.Parser, new[]{ "SendTimestamp", "StartTimestamp" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Alibaba.Otter.Canal.Protocol.Handshake), global::Com.Alibaba.Otter.Canal.Protocol.Handshake.Parser, new[]{ "CommunicationEncoding", "Seeds", "SupportedCompressions" }, new[]{ "CommunicationEncodingPresent" }, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Alibaba.Otter.Canal.Protocol.ClientAuth), global::Com.Alibaba.Otter.Canal.Protocol.ClientAuth.Parser, new[]{ "Username", "Password", "NetReadTimeout", "NetWriteTimeout", "Destination", "ClientId", "Filter", "StartTimestamp" }, new[]{ "NetReadTimeoutPresent", "NetWriteTimeoutPresent" }, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Alibaba.Otter.Canal.Protocol.Ack), global::Com.Alibaba.Otter.Canal.Protocol.Ack.Parser, new[]{ "ErrorCode", "ErrorMessage" }, new[]{ "ErrorCodePresent" }, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Alibaba.Otter.Canal.Protocol.ClientAck), global::Com.Alibaba.Otter.Canal.Protocol.ClientAck.Parser, new[]{ "Destination", "ClientId", "BatchId" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Alibaba.Otter.Canal.Protocol.Sub), global::Com.Alibaba.Otter.Canal.Protocol.Sub.Parser, new[]{ "Destination", "ClientId", "Filter" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Alibaba.Otter.Canal.Protocol.Unsub), global::Com.Alibaba.Otter.Canal.Protocol.Unsub.Parser, new[]{ "Destination", "ClientId", "Filter" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Alibaba.Otter.Canal.Protocol.Get), global::Com.Alibaba.Otter.Canal.Protocol.Get.Parser, new[]{ "Destination", "ClientId", "FetchSize", "Timeout", "Unit", "AutoAck" }, new[]{ "TimeoutPresent", "UnitPresent", "AutoAckPresent" }, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Alibaba.Otter.Canal.Protocol.Messages), global::Com.Alibaba.Otter.Canal.Protocol.Messages.Parser, new[]{ "BatchId", "Messages_" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Alibaba.Otter.Canal.Protocol.Dump), global::Com.Alibaba.Otter.Canal.Protocol.Dump.Parser, new[]{ "Journal", "Position", "Timestamp" }, new[]{ "TimestampPresent" }, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Alibaba.Otter.Canal.Protocol.ClientRollback), global::Com.Alibaba.Otter.Canal.Protocol.ClientRollback.Parser, new[]{ "Destination", "ClientId", "BatchId" }, null, null, null)
+          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::CanalSharp.Protocol.Compression), typeof(global::CanalSharp.Protocol.PacketType), }, new pbr::GeneratedClrTypeInfo[] {
+            new pbr::GeneratedClrTypeInfo(typeof(global::CanalSharp.Protocol.Packet), global::CanalSharp.Protocol.Packet.Parser, new[]{ "MagicNumber", "Version", "Type", "Compression", "Body" }, new[]{ "MagicNumberPresent", "VersionPresent", "CompressionPresent" }, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::CanalSharp.Protocol.HeartBeat), global::CanalSharp.Protocol.HeartBeat.Parser, new[]{ "SendTimestamp", "StartTimestamp" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::CanalSharp.Protocol.Handshake), global::CanalSharp.Protocol.Handshake.Parser, new[]{ "CommunicationEncoding", "Seeds", "SupportedCompressions" }, new[]{ "CommunicationEncodingPresent" }, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::CanalSharp.Protocol.ClientAuth), global::CanalSharp.Protocol.ClientAuth.Parser, new[]{ "Username", "Password", "NetReadTimeout", "NetWriteTimeout", "Destination", "ClientId", "Filter", "StartTimestamp" }, new[]{ "NetReadTimeoutPresent", "NetWriteTimeoutPresent" }, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::CanalSharp.Protocol.Ack), global::CanalSharp.Protocol.Ack.Parser, new[]{ "ErrorCode", "ErrorMessage" }, new[]{ "ErrorCodePresent" }, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::CanalSharp.Protocol.ClientAck), global::CanalSharp.Protocol.ClientAck.Parser, new[]{ "Destination", "ClientId", "BatchId" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::CanalSharp.Protocol.Sub), global::CanalSharp.Protocol.Sub.Parser, new[]{ "Destination", "ClientId", "Filter" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::CanalSharp.Protocol.Unsub), global::CanalSharp.Protocol.Unsub.Parser, new[]{ "Destination", "ClientId", "Filter" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::CanalSharp.Protocol.Get), global::CanalSharp.Protocol.Get.Parser, new[]{ "Destination", "ClientId", "FetchSize", "Timeout", "Unit", "AutoAck" }, new[]{ "TimeoutPresent", "UnitPresent", "AutoAckPresent" }, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::CanalSharp.Protocol.Messages), global::CanalSharp.Protocol.Messages.Parser, new[]{ "BatchId", "Messages_" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::CanalSharp.Protocol.Dump), global::CanalSharp.Protocol.Dump.Parser, new[]{ "Journal", "Position", "Timestamp" }, new[]{ "TimestampPresent" }, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::CanalSharp.Protocol.ClientRollback), global::CanalSharp.Protocol.ClientRollback.Parser, new[]{ "Destination", "ClientId", "BatchId" }, null, null, null)
           }));
     }
     #endregion
@@ -131,7 +131,7 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Alibaba.Otter.Canal.Protocol.CanalProtocolReflection.Descriptor.MessageTypes[0]; }
+      get { return global::CanalSharp.Protocol.CanalProtocolReflection.Descriptor.MessageTypes[0]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -200,9 +200,9 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     /// <summary>Field number for the "type" field.</summary>
     public const int TypeFieldNumber = 3;
-    private global::Com.Alibaba.Otter.Canal.Protocol.PacketType type_ = 0;
+    private global::CanalSharp.Protocol.PacketType type_ = 0;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Com.Alibaba.Otter.Canal.Protocol.PacketType Type {
+    public global::CanalSharp.Protocol.PacketType Type {
       get { return type_; }
       set {
         type_ = value;
@@ -212,8 +212,8 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
     /// <summary>Field number for the "compression" field.</summary>
     public const int CompressionFieldNumber = 4;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Com.Alibaba.Otter.Canal.Protocol.Compression Compression {
-      get { return compressionPresentCase_ == CompressionPresentOneofCase.Compression ? (global::Com.Alibaba.Otter.Canal.Protocol.Compression) compressionPresent_ : Compression.None; }
+    public global::CanalSharp.Protocol.Compression Compression {
+      get { return compressionPresentCase_ == CompressionPresentOneofCase.Compression ? (global::CanalSharp.Protocol.Compression) compressionPresent_ : Compression.None; }
       set {
         compressionPresent_ = value;
         compressionPresentCase_ = CompressionPresentOneofCase.Compression;
@@ -431,7 +431,7 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
             break;
           }
           case 24: {
-            type_ = (global::Com.Alibaba.Otter.Canal.Protocol.PacketType) input.ReadEnum();
+            type_ = (global::CanalSharp.Protocol.PacketType) input.ReadEnum();
             break;
           }
           case 32: {
@@ -457,7 +457,7 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Alibaba.Otter.Canal.Protocol.CanalProtocolReflection.Descriptor.MessageTypes[1]; }
+      get { return global::CanalSharp.Protocol.CanalProtocolReflection.Descriptor.MessageTypes[1]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -614,7 +614,7 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Alibaba.Otter.Canal.Protocol.CanalProtocolReflection.Descriptor.MessageTypes[2]; }
+      get { return global::CanalSharp.Protocol.CanalProtocolReflection.Descriptor.MessageTypes[2]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -671,9 +671,9 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     /// <summary>Field number for the "supported_compressions" field.</summary>
     public const int SupportedCompressionsFieldNumber = 3;
-    private global::Com.Alibaba.Otter.Canal.Protocol.Compression supportedCompressions_ = 0;
+    private global::CanalSharp.Protocol.Compression supportedCompressions_ = 0;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Com.Alibaba.Otter.Canal.Protocol.Compression SupportedCompressions {
+    public global::CanalSharp.Protocol.Compression SupportedCompressions {
       get { return supportedCompressions_; }
       set {
         supportedCompressions_ = value;
@@ -810,7 +810,7 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
             break;
           }
           case 24: {
-            supportedCompressions_ = (global::Com.Alibaba.Otter.Canal.Protocol.Compression) input.ReadEnum();
+            supportedCompressions_ = (global::CanalSharp.Protocol.Compression) input.ReadEnum();
             break;
           }
         }
@@ -830,7 +830,7 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Alibaba.Otter.Canal.Protocol.CanalProtocolReflection.Descriptor.MessageTypes[3]; }
+      get { return global::CanalSharp.Protocol.CanalProtocolReflection.Descriptor.MessageTypes[3]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1220,7 +1220,7 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Alibaba.Otter.Canal.Protocol.CanalProtocolReflection.Descriptor.MessageTypes[4]; }
+      get { return global::CanalSharp.Protocol.CanalProtocolReflection.Descriptor.MessageTypes[4]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1408,7 +1408,7 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Alibaba.Otter.Canal.Protocol.CanalProtocolReflection.Descriptor.MessageTypes[5]; }
+      get { return global::CanalSharp.Protocol.CanalProtocolReflection.Descriptor.MessageTypes[5]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1596,7 +1596,7 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Alibaba.Otter.Canal.Protocol.CanalProtocolReflection.Descriptor.MessageTypes[6]; }
+      get { return global::CanalSharp.Protocol.CanalProtocolReflection.Descriptor.MessageTypes[6]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1784,7 +1784,7 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Alibaba.Otter.Canal.Protocol.CanalProtocolReflection.Descriptor.MessageTypes[7]; }
+      get { return global::CanalSharp.Protocol.CanalProtocolReflection.Descriptor.MessageTypes[7]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1972,7 +1972,7 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Alibaba.Otter.Canal.Protocol.CanalProtocolReflection.Descriptor.MessageTypes[8]; }
+      get { return global::CanalSharp.Protocol.CanalProtocolReflection.Descriptor.MessageTypes[8]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2336,7 +2336,7 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Alibaba.Otter.Canal.Protocol.CanalProtocolReflection.Descriptor.MessageTypes[9]; }
+      get { return global::CanalSharp.Protocol.CanalProtocolReflection.Descriptor.MessageTypes[9]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2488,7 +2488,7 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Alibaba.Otter.Canal.Protocol.CanalProtocolReflection.Descriptor.MessageTypes[10]; }
+      get { return global::CanalSharp.Protocol.CanalProtocolReflection.Descriptor.MessageTypes[10]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2701,7 +2701,7 @@ namespace Com.Alibaba.Otter.Canal.Protocol {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Alibaba.Otter.Canal.Protocol.CanalProtocolReflection.Descriptor.MessageTypes[11]; }
+      get { return global::CanalSharp.Protocol.CanalProtocolReflection.Descriptor.MessageTypes[11]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
