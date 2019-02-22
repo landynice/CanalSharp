@@ -22,7 +22,7 @@ using System.Net;
 namespace CanalSharp.Client.HighAvailability
 {
     /// <summary>
-    /// 简单版本的 node 访问实现
+    ///     简单版本的 node 访问实现
     /// </summary>
     public class SimpleNodeAccessStrategy : ICanalNodeAccessStrategy
     {
@@ -31,10 +31,7 @@ namespace CanalSharp.Client.HighAvailability
 
         public SimpleNodeAccessStrategy(List<SocketAddress> nodes)
         {
-            if (nodes == null || !nodes.Any())
-            {
-                throw new ArgumentException("at least 1 node required.", nameof(nodes));
-            }
+            if (nodes == null || !nodes.Any()) throw new ArgumentException("at least 1 node required.", nameof(nodes));
 
             _nodes.AddRange(nodes);
         }

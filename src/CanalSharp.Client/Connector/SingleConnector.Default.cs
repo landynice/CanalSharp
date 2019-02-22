@@ -19,54 +19,76 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
-using System.Text;
+using CanalSharp.Common.Exceptions;
 using CanalSharp.Common.Logging;
 using CanalSharp.Protocol;
-using CanalSharp.Protocol.Exception;
-using DotNetty.Common.Utilities;
-using DotNetty.Transport.Channels;
 using Google.Protobuf;
 using Microsoft.Extensions.Logging;
 
 namespace CanalSharp.Client.Connector
 {
-    public class SingleCanalConnector : ChannelHandlerAdapter, ICanalConnector
+    /// <summary>
+    /// Single means does not support clustering
+    /// </summary>
+    public class SingleConnector : IConnector
     {
-        private readonly ILogger _logger = CanalSharpLogManager.LoggerFactory.CreateLogger<SingleCanalConnector>();
-
-        private readonly ClientIdentity _clientIdentity;
-
-        /// <summary>
-        ///  // 代表 connected 是否已正常执行，因为有 HA，不代表在工作中
-        /// </summary>
-        private volatile bool _connected;
-
-        private volatile bool _running;
-
-        /// <summary>
-        /// 记录上一次的 filter 提交值, 便于自动重试时提交
-        /// </summary>
-        private string _filter;
-
-        private List<Compression> _supportedCompressions = new List<Compression>();
         private static readonly object _writeDataLock = new object();
 
         private static readonly object _readDataLock = new object();
 
-        // 是否在 connect 链接成功后，自动执行 rollback 操作
-        private bool _rollbackOnConnect = true;
+        private readonly ClientIdentity _clientIdentity;
+        private readonly ILogger _logger = CanalSharpLogManager.LoggerFactory.CreateLogger<SingleConnector>();
+        private NetworkStream _channelNetworkStream;
+
+        /// <summary>
+        ///     // 代表 connected 是否已正常执行，因为有 HA，不代表在工作中
+        /// </summary>
+        private volatile bool _connected;
+
+        /// <summary>
+        ///     记录上一次的 filter 提交值, 便于自动重试时提交
+        /// </summary>
+        private string _filter;
 
 //        private Message _message;
 
         // 是否自动化解析 Entry 对象, 如果考虑最大化性能可以延后解析
-        private bool _lazyParseEntry = false;
-        private TcpClient _tcpClient;
-        private NetworkStream _channelNetworkStream;
+        private readonly bool _lazyParseEntry = false;
+
+        // 是否在 connect 链接成功后，自动执行 rollback 操作
+        private readonly bool _rollbackOnConnect = true;
 
         /// <summary>
-        /// 是否在 connect 链接成功后, 自动执行rollback操作
+        ///     是否在 connect 链接成功后, 自动执行rollback操作
         /// </summary>
-        private bool _rollbackOnDisConnect = false;
+        private readonly bool _rollbackOnDisConnect = false;
+
+        private volatile bool _running;
+
+        private readonly List<Compression> _supportedCompressions = new List<Compression>();
+        private TcpClient _tcpClient;
+
+        public SingleConnector(string address, int port, string username, string password, string destination) :
+            this(address, port, username, password, destination, 60000, 60 * 60 * 1000)
+        {
+        }
+
+        public SingleConnector(string address, int port, string username, string password, string destination,
+            int soTimeout) : this(address, port, username, password, destination, soTimeout, 60 * 60 * 1000)
+        {
+        }
+
+        public SingleConnector(string address, int port, string username, string password, string destination,
+            int soTimeout, int idleTimeout)
+        {
+            Address = address;
+            Port = port;
+            UserName = username;
+            UserName = password;
+            SoTimeOut = soTimeout;
+            IdleTimeOut = idleTimeout;
+            _clientIdentity = new ClientIdentity(destination, 1001);
+        }
 
         public string Address { get; set; }
 
@@ -77,87 +99,36 @@ namespace CanalSharp.Client.Connector
         public string PassWord { get; set; }
 
         /// <summary>
-        ///  // milliseconds
+        ///     // milliseconds
         /// </summary>
         public int SoTimeOut { get; set; } = 60000;
 
         /// <summary>
-        /// client 和 server 之间的空闲链接超时的时间, 默认为1小时
+        ///     client 和 server 之间的空闲链接超时的时间, 默认为1小时
         /// </summary>
         public int IdleTimeOut { get; set; } = 60 * 60 * 1000;
 
-        public SingleCanalConnector(string address, int port, string username, string password, string destination) :
-            this(address, port, username, password, destination, 60000, 60 * 60 * 1000)
-        {
-        }
-
-        public SingleCanalConnector(string address, int port, string username, string password, string destination,
-            int soTimeout) : this(address, port, username, password, destination, soTimeout, 60 * 60 * 1000)
-        {
-        }
-
-        public SingleCanalConnector(string address, int port, string username, string password, string destination,
-            int soTimeout, int idleTimeout)
-        {
-            Address = address;
-            Port = port;
-            UserName = username;
-            UserName = password;
-            SoTimeOut = soTimeout;
-            IdleTimeOut = idleTimeout;
-            _clientIdentity = new ClientIdentity(destination,  1001);
-        }
-
         public void Connect()
         {
-            if (_connected)
-            {
-                return;
-            }
+            if (_connected) return;
 
             WaitClientRunning();
-            if (!_running)
-            {
-                return;
-            }
+            if (!_running) return;
 
             DoConnect();
-            if (_filter != null)
-            {
-                // 如果存在条件，说明是自动切换，基于上一次的条件订阅一次
-                Subscribe(_filter);
-            }
+            if (_filter != null) Subscribe(_filter);
 
-            if (_rollbackOnConnect)
-            {
-                Rollback();
-            }
+            if (_rollbackOnConnect) Rollback();
 
             _connected = true;
         }
 
         public void Disconnect()
         {
-            if (_rollbackOnDisConnect && _tcpClient.Connected == false)
-            {
-                Rollback();
-            }
+            if (_rollbackOnDisConnect && _tcpClient.Connected == false) Rollback();
 
             _connected = false;
             DoDisConnection();
-        }
-
-        private void DoDisConnection()
-        {
-            if (_tcpClient != null)
-            {
-                QuietlyClose();
-            }
-        }
-
-        private void QuietlyClose()
-        {
-            _tcpClient.Close();
         }
 
         public bool CheckValid()
@@ -168,20 +139,17 @@ namespace CanalSharp.Client.Connector
         public void Subscribe(string filter)
         {
             WaitClientRunning();
-            if (!_running)
-            {
-                return;
-            }
+            if (!_running) return;
 
             try
             {
-                var sub = new Sub()
+                var sub = new Sub
                 {
                     Destination = _clientIdentity.Destination,
                     ClientId = _clientIdentity.ClientId.ToString(),
-                    Filter = string.IsNullOrEmpty(filter)? ".*\\..*":filter
+                    Filter = string.IsNullOrEmpty(filter) ? ".*\\..*" : filter
                 };
-                var pack = new Packet()
+                var pack = new Packet
                 {
                     Type = PacketType.Subscription,
                     Body = sub.ToByteString()
@@ -191,10 +159,7 @@ namespace CanalSharp.Client.Connector
 
                 var p = Packet.Parser.ParseFrom(ReadNextPacket());
                 var ack = Protocol.Ack.Parser.ParseFrom(p.Body);
-                if (ack.ErrorCode > 0)
-                {
-                    throw new CanalClientException($"failed to subscribe with reason: {ack.ErrorMessage}");
-                }
+                if (ack.ErrorCode > 0) throw new CanalException($"failed to subscribe with reason: {ack.ErrorMessage}");
 
                 _clientIdentity.Filter = filter;
                 _filter = filter;
@@ -202,7 +167,7 @@ namespace CanalSharp.Client.Connector
             }
             catch (Exception e)
             {
-                throw new CanalClientException(e.Message);
+                throw new CanalException(e.Message);
             }
         }
 
@@ -214,19 +179,16 @@ namespace CanalSharp.Client.Connector
         public void UnSubscribe()
         {
             WaitClientRunning();
-            if (!_running)
-            {
-                return;
-            }
+            if (!_running) return;
 
             try
             {
-                var unsub = new Unsub()
+                var unsub = new Unsub
                 {
                     Destination = _clientIdentity.Destination,
-                    ClientId = _clientIdentity.ClientId.ToString(),
+                    ClientId = _clientIdentity.ClientId.ToString()
                 };
-                var pack = new Packet()
+                var pack = new Packet
                 {
                     Type = PacketType.Unsubscription,
                     Body = unsub.ToByteString()
@@ -235,13 +197,11 @@ namespace CanalSharp.Client.Connector
                 var p = Packet.Parser.ParseFrom(ReadNextPacket());
                 var ack = Protocol.Ack.Parser.ParseFrom(p.Body);
                 if (ack.ErrorCode > 0)
-                {
-                    throw new CanalClientException($"failed to unSubscribe with reason: {ack.ErrorMessage}");
-                }
+                    throw new CanalException($"failed to unSubscribe with reason: {ack.ErrorMessage}");
             }
             catch (IOException e)
             {
-                throw new CanalClientException(e.Message, e);
+                throw new CanalException(e.Message, e);
             }
         }
 
@@ -266,20 +226,14 @@ namespace CanalSharp.Client.Connector
         public Message GetWithoutAck(int batchSize, long? timeout, int? unit)
         {
             WaitClientRunning();
-            if (!_running)
-            {
-                return null;
-            }
+            if (!_running) return null;
 
-            var size = (batchSize <= 0) ? 1000 : batchSize;
+            var size = batchSize <= 0 ? 1000 : batchSize;
             // -1 代表不做 timeout 控制
-            var time = (timeout == null || timeout < 0) ? -1 : timeout;
-            if (unit == null)
-            {
-                unit = 1;
-            }
+            var time = timeout == null || timeout < 0 ? -1 : timeout;
+            if (unit == null) unit = 1;
 
-            var get = new Get()
+            var get = new Get
             {
                 AutoAck = false,
                 Destination = _clientIdentity.Destination,
@@ -288,7 +242,7 @@ namespace CanalSharp.Client.Connector
                 Timeout = (long) time,
                 Unit = (int) unit
             };
-            var packet = new Packet()
+            var packet = new Packet
             {
                 Type = PacketType.Get,
                 Body = get.ToByteString()
@@ -299,64 +253,19 @@ namespace CanalSharp.Client.Connector
             return ReceiveMessages();
         }
 
-        private Message ReceiveMessages()
-        {
-            var data = ReadNextPacket();
-            var p = Packet.Parser.ParseFrom(data);
-            switch (p.Type)
-            {
-                case PacketType.Messages:
-                {
-                    if (!p.Compression.Equals(Compression.None))
-                    {
-                        throw new CanalClientException("compression is not supported in this connector");
-                    }
-
-                    var messages = Messages.Parser.ParseFrom(p.Body);
-                    var result = new Message(messages.BatchId);
-                    if (_lazyParseEntry)
-                    {
-                        // byteString
-                        result.RawEntries = messages.Messages_.ToList();
-                    }
-                    else
-                    {
-                        foreach (var byteString in messages.Messages_)
-                        {
-                            result.Entries.Add(Entry.Parser.ParseFrom(byteString));
-                        }
-                    }
-
-                    return result;
-                }
-                case PacketType.Ack:
-                {
-                    var ack = Protocol.Ack.Parser.ParseFrom(p.Body);
-                    throw new CanalClientException($"something goes wrong with reason:{ack.ErrorMessage}");
-                }
-                default:
-                {
-                    throw new CanalClientException($"unexpected packet type: {p.Type}");
-                }
-            }
-        }
-
         public void Ack(long batchId)
         {
             WaitClientRunning();
-            if (!_running)
-            {
-                return;
-            }
+            if (!_running) return;
 
-            var ca = new ClientAck()
+            var ca = new ClientAck
             {
                 Destination = _clientIdentity.Destination,
                 ClientId = _clientIdentity.ClientId.ToString(),
                 BatchId = batchId
             };
 
-            var pack = new Packet()
+            var pack = new Packet
             {
                 Type = PacketType.Clientack,
                 Body = ca.ToByteString()
@@ -368,7 +277,7 @@ namespace CanalSharp.Client.Connector
             }
             catch (IOException e)
             {
-                throw new CanalClientException(e.Message, e);
+                throw new CanalException(e.Message, e);
             }
         }
 
@@ -376,7 +285,7 @@ namespace CanalSharp.Client.Connector
         {
             WaitClientRunning();
 
-            var ca = new ClientRollback()
+            var ca = new ClientRollback
             {
                 Destination = _clientIdentity.Destination,
                 ClientId = _clientIdentity.ClientId.ToString(),
@@ -385,7 +294,7 @@ namespace CanalSharp.Client.Connector
 
             try
             {
-                var pack = new Packet()
+                var pack = new Packet
                 {
                     Type = PacketType.Clientrollback,
                     Body = ca.ToByteString()
@@ -395,7 +304,7 @@ namespace CanalSharp.Client.Connector
             }
             catch (IOException e)
             {
-                throw new CanalClientException(e.Message, e);
+                throw new CanalException(e.Message, e);
             }
         }
 
@@ -410,6 +319,49 @@ namespace CanalSharp.Client.Connector
             throw new NotImplementedException();
         }
 
+        private void DoDisConnection()
+        {
+            if (_tcpClient != null) QuietlyClose();
+        }
+
+        private void QuietlyClose()
+        {
+            _tcpClient.Close();
+        }
+
+        private Message ReceiveMessages()
+        {
+            var data = ReadNextPacket();
+            var p = Packet.Parser.ParseFrom(data);
+            switch (p.Type)
+            {
+                case PacketType.Messages:
+                {
+                    if (!p.Compression.Equals(Compression.None))
+                        throw new CanalException("compression is not supported in this connector");
+
+                    var messages = Messages.Parser.ParseFrom(p.Body);
+                    var result = new Message(messages.BatchId);
+                    if (_lazyParseEntry)
+                        result.RawEntries = messages.Messages_.ToList();
+                    else
+                        foreach (var byteString in messages.Messages_)
+                            result.Entries.Add(Entry.Parser.ParseFrom(byteString));
+
+                    return result;
+                }
+                case PacketType.Ack:
+                {
+                    var ack = Protocol.Ack.Parser.ParseFrom(p.Body);
+                    throw new CanalException($"something goes wrong with reason:{ack.ErrorMessage}");
+                }
+                default:
+                {
+                    throw new CanalException($"unexpected packet type: {p.Type}");
+                }
+            }
+        }
+
         private void DoConnect()
         {
             _tcpClient = new TcpClient(Address, Port);
@@ -417,20 +369,14 @@ namespace CanalSharp.Client.Connector
             var p = Packet.Parser.ParseFrom(ReadNextPacket());
             if (p != null)
             {
-                if (p.Version != 1)
-                {
-                    throw new CanalClientException("unsupported version at this client.");
-                }
+                if (p.Version != 1) throw new CanalException("unsupported version at this client.");
 
-                if (p.Type != PacketType.Handshake)
-                {
-                    throw new CanalClientException("expect handshake but found other type.");
-                }
+                if (p.Type != PacketType.Handshake) throw new CanalException("expect handshake but found other type.");
 
                 var handshake = Handshake.Parser.ParseFrom(p.Body);
                 _supportedCompressions.Add(handshake.SupportedCompressions);
 
-                var ca = new ClientAuth()
+                var ca = new ClientAuth
                 {
                     Username = UserName ?? "",
                     Password = ByteString.CopyFromUtf8(PassWord ?? ""),
@@ -438,7 +384,7 @@ namespace CanalSharp.Client.Connector
                     NetWriteTimeout = IdleTimeOut
                 };
 
-                var packArray = new Packet()
+                var packArray = new Packet
                 {
                     Type = PacketType.Clientauthentication,
                     Body = ca.ToByteString()
@@ -448,16 +394,12 @@ namespace CanalSharp.Client.Connector
 
                 var packet = Packet.Parser.ParseFrom(ReadNextPacket());
                 if (packet.Type != PacketType.Ack)
-                {
-                    throw new CanalClientException("unexpected packet type when ack is expected");
-                }
+                    throw new CanalException("unexpected packet type when ack is expected");
 
                 var ackBody = Protocol.Ack.Parser.ParseFrom(p.Body);
                 if (ackBody.ErrorCode > 0)
-                {
-                    throw new CanalClientException("something goes wrong when doing authentication:" +
-                                                   ackBody.ErrorMessage);
-                }
+                    throw new CanalException("something goes wrong when doing authentication:" +
+                                             ackBody.ErrorMessage);
 
                 _connected = _tcpClient.Connected;
                 _logger.LogDebug($"Canal connect success. IP: {Address}, Port: {Port}");
@@ -476,10 +418,11 @@ namespace CanalSharp.Client.Connector
                     while (headerLength > 0)
                     {
                         var len = _channelNetworkStream.Read(receiveData, 0,
-                            (headerLength > receiveData.Length ? receiveData.Length : headerLength));
+                            headerLength > receiveData.Length ? receiveData.Length : headerLength);
                         ms.Write(receiveData, 0, len);
                         headerLength = headerLength - len;
                     }
+
                     return ms.ToArray();
                 }
             }

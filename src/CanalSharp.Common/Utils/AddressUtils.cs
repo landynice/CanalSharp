@@ -29,8 +29,8 @@ namespace CanalSharp.Common.Utils
     public class AddressUtils
     {
         private static readonly ILogger Logger;
-        private static string LOCALHOST_IP = "127.0.0.1";
-        private static string EMPTY_IP = "0.0.0.0";
+        private static readonly string LOCALHOST_IP = "127.0.0.1";
+        private static readonly string EMPTY_IP = "0.0.0.0";
         private static readonly Regex IpPattern = new Regex("[0-9]{1,3}(\\.[0-9]{1,3}){3,}");
 
         static AddressUtils()
@@ -55,7 +55,6 @@ namespace CanalSharp.Common.Utils
             finally
             {
                 if (ss != null)
-                {
                     try
                     {
                         ss.Stop();
@@ -64,7 +63,6 @@ namespace CanalSharp.Common.Utils
                     {
                         Logger.LogError($"Stop tcp listener failed: {e}");
                     }
-                }
             }
         }
 
@@ -72,7 +70,7 @@ namespace CanalSharp.Common.Utils
         {
             if (address == null || IPAddress.IsLoopback(address)) return false;
             var name = Dns.GetHostEntry(address).HostName;
-            return (name != null && !EMPTY_IP.Equals(name) && !LOCALHOST_IP.Equals(name) && IpPattern.IsMatch(name));
+            return name != null && !EMPTY_IP.Equals(name) && !LOCALHOST_IP.Equals(name) && IpPattern.IsMatch(name);
         }
 
 
@@ -110,12 +108,9 @@ namespace CanalSharp.Common.Utils
                 localAddress = Dns.GetHostEntry(Dns.GetHostName())
                     .AddressList.First(
                         f => f.AddressFamily == AddressFamily.InterNetwork);
-                if (IsValidHostAddress(localAddress))
-                {
-                    return localAddress;
-                }
+                if (IsValidHostAddress(localAddress)) return localAddress;
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 Logger.LogWarning(
                     $"Failed to retrieving local host ip address, try scan network card ip address. cause: {e}");
@@ -132,14 +127,11 @@ namespace CanalSharp.Common.Utils
                     {
                         if (ip.Address.AddressFamily != AddressFamily.InterNetwork) continue;
                         var address = ip.Address;
-                        if (IsValidHostAddress(address))
-                        {
-                            return address;
-                        }
+                        if (IsValidHostAddress(address)) return address;
                     }
                 }
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 Logger.LogWarning($"Failed to retrieving network card ip address. cause:{e}");
             }

@@ -14,14 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using CanalSharp.Common.Exception;
+using CanalSharp.Common.Exceptions;
 
 namespace CanalSharp.Common
 {
     public abstract class AbstractCanalLifeCycle : ICanalLifeCycle
     {
         /// <summary>
-        /// 是否处于运行中
+        ///     是否处于运行中
         /// </summary>
         protected volatile bool Running;
 
@@ -33,19 +33,14 @@ namespace CanalSharp.Common
         public virtual void Start()
         {
             if (Running)
-            {
                 throw new CanalException($" {nameof(AbstractCanalLifeCycle)} has startup , don't repeat start");
-            }
 
             Running = true;
         }
 
         public virtual void Stop()
         {
-            if (!Running)
-            {
-                throw new CanalException($"{nameof(AbstractCanalLifeCycle)} isn't start , please check");
-            }
+            if (!Running) throw new CanalException($"{nameof(AbstractCanalLifeCycle)} isn't start , please check");
 
             Running = false;
         }

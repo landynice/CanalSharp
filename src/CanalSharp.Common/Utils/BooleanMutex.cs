@@ -22,7 +22,7 @@ namespace CanalSharp.Common.Utils
     {
         public void Set()
         {
-            Mutex mutex = new Mutex();
+            var mutex = new Mutex();
             mutex.ReleaseMutex();
         }
     }

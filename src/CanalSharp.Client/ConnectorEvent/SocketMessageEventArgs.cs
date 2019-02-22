@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CanalSharp.Client.Socket
+namespace CanalSharp.Client.ConnectorEvent
 {
     public class SocketMessageEventArgs : EventArgs
     {

@@ -17,7 +17,7 @@
 namespace CanalSharp.Client.HighAvailability.Running
 {
     /// <summary>
-    /// client running状态信息
+    ///     client running状态信息
     /// </summary>
     public class ClientRunningData
     {

@@ -14,29 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using CanalSharp.Client.Connector;
+using System;
 
-namespace CanalSharp.Client
+namespace CanalSharp.Common.Exceptions
 {
-    public class CanalConnectorFactory
+    public class CanalException : Exception
     {
-        /// <summary>
-        /// 创建单链接的客户端链接
-        /// </summary>
-        /// <param name="address"></param>
-        /// <param name="destination"></param>
-        /// <param name="username"></param>
-        /// <param name="password"></param>
-        /// <returns></returns>
-        public static ICanalConnector CreateSingleConnector(string address, int port, string destination, string username,
-            string password)
+        public CanalException(string message) : base(message)
         {
-            var canalConnector = new SingleCanalConnector(address, port, username, password, destination)
-            {
-                SoTimeOut = 60 * 1000,
-                IdleTimeOut = 60 * 60 * 1000
-            };
-            return canalConnector;
+        }
+
+        public CanalException(string message, Exception inner) : base(message, inner)
+        {
         }
     }
 }

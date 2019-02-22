@@ -1,19 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using CanalSharp.Client;
 using CanalSharp.Client.Connector;
-using CanalSharp.Client.Socket;
 using CanalSharp.Common.Logging;
 using CanalSharp.Protocol;
-using DotNetty.Transport.Bootstrapping;
-using DotNetty.Transport.Channels;
-using DotNetty.Transport.Channels.Sockets;
 using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Config;
@@ -33,7 +25,11 @@ namespace CanalSharp.SimpleClient
             //设置 NLog
             CanalSharpLogManager.LoggerFactory.AddNLog();
             _logger = CanalSharpLogManager.LoggerFactory.CreateLogger("Program");
-            var conn = new SingleCanalConnector2("192.168.157.132", 11111, "", "", "example");
+            var conn = new EventSingleConnector("192.168.157.132", 11111, "example","");
+            conn.OnReady += (sender, e) =>
+            {
+                _logger.LogInformation("Ready!");
+            };
             conn.OnMessage += (sender, e) =>
             {
                 PrintEntry(e.Data.Entries);
@@ -64,7 +60,14 @@ namespace CanalSharp.SimpleClient
 //            
 //                PrintEntry(message.Entries);
 //            }
-            Console.ReadKey();
+            while (true)
+            {
+                if (Console.ReadLine()?.ToLower() == "exit")
+                {
+                    break;
+                }
+            }
+            await conn.CloseAsync();
         }
         
 

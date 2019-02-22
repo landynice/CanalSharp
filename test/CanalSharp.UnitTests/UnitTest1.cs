@@ -8,13 +8,12 @@ namespace CanalSharp.UnitTests
 {
     public class UnitTest1
     {
-        private string aa;
         private static readonly object _lock = new object();
         [Fact]
         public void Test1()
         {
             string destination = "example";
-            ICanalConnector connector = CanalConnectorFactory.CreateSingleConnector("127.0.0.1", 11111, destination, "", "");
+            IConnector connector = ConnectorFactory.CreateSingleConnector("127.0.0.1", 11111, destination, "", "");
             connector.Connect();
             Console.Read();
 
@@ -29,13 +28,12 @@ namespace CanalSharp.UnitTests
 
         }
 
-
+        [Fact]
         public void Test()
         {
             lock (_lock)
             {
                 Thread.Sleep(500);
-                aa = "aaaaa";
                 Monitor.Pulse(_lock);
             }
             

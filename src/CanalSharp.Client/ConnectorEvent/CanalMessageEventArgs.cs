@@ -1,7 +1,7 @@
 ﻿using System;
 using CanalSharp.Protocol;
 
-namespace CanalSharp.Client.Connector
+namespace CanalSharp.Client.ConnectorEvent
 {
     public class CanalMessageEventArgs : EventArgs
     {

@@ -14,15 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace CanalSharp.Protocol.Exception
+using System;
+
+namespace CanalSharp.Common.Exceptions
 {
-    public class CanalClientException : System.Exception
+    public class CanalProtocolException : Exception
     {
-        public CanalClientException(string message) : base(message)
+        public CanalProtocolException(string message) : base(message)
         {
         }
 
-        public CanalClientException(string message, System.Exception inner) : base(message, inner)
+        public CanalProtocolException(string message, Exception inner) : base(message, inner)
         {
         }
     }
