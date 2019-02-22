@@ -66,6 +66,7 @@ namespace CanalSharp.Client.Socket
                 if (byteBuffer.IoBufferCount == 1)
                 {
                     ArraySegment<byte> bytes = byteBuffer.GetIoBuffer(byteBuffer.ReaderIndex, length);
+                    
                     _pipeWriter.WriteAsync(bytes);
                 }
                 else
@@ -110,35 +111,44 @@ namespace CanalSharp.Client.Socket
 
         private async Task ReadPipeAsync()
         {
-            ReadResult result = await _pipeReader.ReadAsync();
-
-            ReadOnlySequence<byte> buffer = result.Buffer;
-
-            while (buffer.Length > ProtocolHeaderLength)
+            while (true)
             {
-                var headerSequence = buffer.Slice(buffer.Start, ProtocolHeaderLength);
-                var headerBytes = headerSequence.ToArray();
-                Array.Reverse(headerBytes);
-                var dataLength = BitConverter.ToInt32(headerBytes, 0);
-                var dataPosition = buffer.GetPosition(ProtocolHeaderLength);
-                buffer = buffer.Slice(dataPosition);
+                ReadResult result = await _pipeReader.ReadAsync();
 
-                if (buffer.Length >= dataLength)
+                ReadOnlySequence<byte> buffer = result.Buffer;
+
+                while (buffer.Length > ProtocolHeaderLength)
                 {
-                    var dataSequence = buffer.Slice(buffer.Start, dataLength);
-
-                    await OnMessage(this, new MessageEventArgs() { Data = dataSequence.ToArray() });
-
-                    dataPosition = buffer.GetPosition(dataLength);
+                    var headerSequence = buffer.Slice(buffer.Start, ProtocolHeaderLength);
+                    var headerBytes = headerSequence.ToArray();
+                    Array.Reverse(headerBytes);
+                    var dataLength = BitConverter.ToInt32(headerBytes, 0);
+                    var dataPosition = buffer.GetPosition(ProtocolHeaderLength);
                     buffer = buffer.Slice(dataPosition);
+
+                    if (buffer.Length >= dataLength)
+                    {
+                        var dataSequence = buffer.Slice(buffer.Start, dataLength);
+
+                        await OnMessage(this, new MessageEventArgs() { Data = dataSequence.ToArray() });
+
+                        dataPosition = buffer.GetPosition(dataLength);
+                        buffer = buffer.Slice(dataPosition);
+                    }
+                    else
+                    {
+                        break;
+                    }
+
+                    _pipeReader.AdvanceTo(buffer.Start, buffer.End);
                 }
-                else
+
+
+                if (result.IsCompleted)
                 {
                     break;
                 }
             }
-
-            _pipeReader.AdvanceTo(buffer.Start, buffer.End);
         }
     }
 }

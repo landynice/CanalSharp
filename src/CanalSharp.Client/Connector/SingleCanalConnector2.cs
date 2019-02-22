@@ -39,7 +39,7 @@ namespace CanalSharp.Client.Connector
         private readonly ClientIdentity _clientIdentity;
 
         private List<Compression> _supportedCompressions = new List<Compression>();
-        
+
         /// <summary>
         /// Canal Server IP地址
         /// </summary>
@@ -63,14 +63,15 @@ namespace CanalSharp.Client.Connector
         /// client 和 server 之间的空闲链接超时的时间, 默认为1小时
         /// </summary>
         public int IdleTimeOut { get; set; } = 60 * 60 * 1000;
+
         public int GetMesageTimeOut { get; set; } = -1;
         public int GetMesageUnit { get; set; } = 1;
-        public bool GetMesageWithAck { get; set; } = false;
-        public string Filter { get; set; }
+        public bool AotuAck { get; set; } = false;
+        public string Filter { get; set; } = ".*\\..*";
 
         public int BitchSize { get; set; } = 1024;
 
-        public CanalConnectState ConnectState { get; private set; }= CanalConnectState.Init;
+        public CanalConnectState ConnectState { get; private set; } = CanalConnectState.Init;
 
         private IChannel _channel;
 
@@ -93,7 +94,7 @@ namespace CanalSharp.Client.Connector
             UserName = password;
             SoTimeOut = soTimeout;
             IdleTimeOut = idleTimeout;
-            _clientIdentity = new ClientIdentity(destination,  1001);
+            _clientIdentity = new ClientIdentity(destination, 1001);
         }
 
         /*private void DoConnect()
@@ -171,31 +172,32 @@ namespace CanalSharp.Client.Connector
 
         private async Task ProcessMessage(object sender, MessageEventArgs e)
         {
-            await SendHandshake();
-            await SendSubscribe();
-//            try
-//            {
-//
-//                switch (ConnectState)
-//                {
-//                    case CanalConnectState.Init:
-//                        await ProcessInitAsync(e.Data);
-//                        break;
-//                    case CanalConnectState.Handshake:
-//                        await ProcessHandshakeAsync(e.Data);
-//                        break;
-//                    case CanalConnectState.Connected:
-//                        await ProcessSubscribeAsync(e.Data);
-//                        break;
-//                    default:
-//                        throw new CanalClientException("Unexpected Packets.");
-//                }
-//            }
-//            catch (Exception exception)
-//            {
-//                Console.WriteLine(exception);
-//                throw;
-//            }
+            Console.WriteLine("ProcessMessage");
+            try
+            {
+                switch (ConnectState)
+                {
+                    case CanalConnectState.Init:
+                        await ProcessInitAsync(e.Data);
+                        break;
+                    case CanalConnectState.Handshake:
+                        await ProcessHandshakeAsync(e.Data);
+                        break;
+                    case CanalConnectState.Connected:
+                        await ProcessSubscribeAsync(e.Data);
+                        break;
+                    case CanalConnectState.Subscribe:
+                        await ProcessGetMessage(e.Data);
+                        break;
+                    default:
+                        throw new CanalClientException("Unexpected Packets.");
+                }
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+                throw;
+            }
         }
 
         /// <summary>
@@ -217,38 +219,21 @@ namespace CanalSharp.Client.Connector
                 {
                     throw new CanalClientException("expect handshake but found other type.");
                 }
-                var handshake = Handshake.Parser.ParseFrom(p.Body);
-                _supportedCompressions.Add(handshake.SupportedCompressions);
-
-                var ca = new ClientAuth()
-                {
-                    Username = UserName ?? "",
-                    Password = ByteString.CopyFromUtf8(PassWord ?? ""),
-                    NetReadTimeout = IdleTimeOut,
-                    NetWriteTimeout = IdleTimeOut
-                };
-
-                var packArray = new Packet()
-                {
-                    Type = PacketType.Clientauthentication,
-                    Body = ca.ToByteString()
-                }.ToByteArray();
-                await SendDataAsync(packArray);
-
-                //                var ackBody = Protocol.Ack.Parser.ParseFrom(p.Body);
-                //                if (ackBody.ErrorCode > 0)
-                //                {
-                //                    throw new CanalClientException("something goes wrong when doing authentication:" +
-                //                                                   ackBody.ErrorMessage);
-                //                }
-                //
-                //
-                //                var handshake = Handshake.Parser.ParseFrom(p.Body);
-                //                _supportedCompressions.Add(handshake.SupportedCompressions);
-                //
-                //                await SendHandshake();
-                //                ConnectState = CanalConnectState.Handshake;
             }
+            
+            var ackBody = Protocol.Ack.Parser.ParseFrom(p.Body);
+            if (ackBody.ErrorCode > 0)
+            {
+                throw new CanalClientException("something goes wrong when doing authentication:" +
+                                               ackBody.ErrorMessage);
+            }
+
+            var handshake = Handshake.Parser.ParseFrom(p.Body);
+            _supportedCompressions.Add(handshake.SupportedCompressions);
+
+            await SendHandshake();
+
+            ConnectState = CanalConnectState.Handshake;
         }
 
         /// <summary>
@@ -288,7 +273,7 @@ namespace CanalSharp.Client.Connector
         /// <summary>
         /// 处理收到的数据
         /// </summary>
-        private async Task ProcessMessage(byte[] data)
+        private async Task ProcessGetMessage(byte[] data)
         {
             var packet = Packet.Parser.ParseFrom(data);
             if (packet.Type != PacketType.Ack)
@@ -297,6 +282,7 @@ namespace CanalSharp.Client.Connector
             }
 
             ConnectState = CanalConnectState.Connected;
+
             await SendGetMessage();
         }
 
@@ -308,7 +294,6 @@ namespace CanalSharp.Client.Connector
         /// <returns></returns>
         private async Task SendHandshake()
         {
-
             var ca = new ClientAuth()
             {
                 Username = UserName ?? "",
@@ -355,7 +340,7 @@ namespace CanalSharp.Client.Connector
         {
             var get = new Get()
             {
-                AutoAck = GetMesageWithAck,
+                AutoAck = this.AotuAck,
                 Destination = _clientIdentity.Destination,
                 ClientId = _clientIdentity.ClientId.ToString(),
                 FetchSize = BitchSize,
@@ -374,14 +359,13 @@ namespace CanalSharp.Client.Connector
         /// 发送数据包
         /// </summary>
         /// <param name="body"></param>
-        private async Task SendDataAsync(byte[] body)
+        public async Task SendDataAsync(byte[] body)
         {
             try
             {
-
                 var headerBytes = BitConverter.GetBytes(body.Length);
-//                Array.Reverse(headerBytes);
-                var msg = Unpooled.Buffer(body.Length+headerBytes.Length);
+                Array.Reverse(headerBytes);
+                var msg = Unpooled.Buffer(body.Length + headerBytes.Length);
                 msg.WriteBytes(headerBytes);
                 msg.WriteBytes(body);
                 await _channel.WriteAndFlushAsync(msg);
@@ -394,6 +378,5 @@ namespace CanalSharp.Client.Connector
         }
 
         #endregion
-
     }
 }
