@@ -18,11 +18,11 @@ namespace CanalSharp.Protocol.Exception
 {
     public class CanalClientException : System.Exception
     {
-        public CanalClientException(string errorCode) : base(errorCode)
+        public CanalClientException(string message) : base(message)
         {
         }
 
-        public CanalClientException(string errorCode, System.Exception cause) : base(errorCode, cause)
+        public CanalClientException(string message, System.Exception inner) : base(message, inner)
         {
         }
     }

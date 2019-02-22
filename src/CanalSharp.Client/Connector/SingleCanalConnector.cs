@@ -19,9 +19,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
+using System.Text;
 using CanalSharp.Common.Logging;
 using CanalSharp.Protocol;
 using CanalSharp.Protocol.Exception;
+using DotNetty.Common.Utilities;
 using DotNetty.Transport.Channels;
 using Google.Protobuf;
 using Microsoft.Extensions.Logging;
@@ -103,7 +105,7 @@ namespace CanalSharp.Client.Connector
             UserName = password;
             SoTimeOut = soTimeout;
             IdleTimeOut = idleTimeout;
-            _clientIdentity = new ClientIdentity(destination, (short) 1001);
+            _clientIdentity = new ClientIdentity(destination,  1001);
         }
 
         public void Connect()
@@ -478,7 +480,6 @@ namespace CanalSharp.Client.Connector
                         ms.Write(receiveData, 0, len);
                         headerLength = headerLength - len;
                     }
-
                     return ms.ToArray();
                 }
             }

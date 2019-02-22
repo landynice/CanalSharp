@@ -2,10 +2,17 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using CanalSharp.Client;
+using CanalSharp.Client.Connector;
+using CanalSharp.Client.Socket;
 using CanalSharp.Common.Logging;
 using CanalSharp.Protocol;
+using DotNetty.Transport.Bootstrapping;
+using DotNetty.Transport.Channels;
+using DotNetty.Transport.Channels.Sockets;
 using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Config;
@@ -18,37 +25,40 @@ namespace CanalSharp.SimpleClient
     {
         private static ILogger _logger;
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            LogManager.Configuration = new XmlLoggingConfiguration("NLog.Config");
-            //设置 NLog
-            CanalSharpLogManager.LoggerFactory.AddNLog();
-            _logger = CanalSharpLogManager.LoggerFactory.CreateLogger("Program");
-            //canal 配置的 destination，默认为 example
-            var destination = "example";
-            //创建一个简单 CanalClient 连接对象（此对象不支持集群）传入参数分别为 canal 地址、端口、destination、用户名、密码
-            var connector = CanalConnectorFactory.CreateSingleConnector("127.0.0.1", 11111, destination, "", "");
-            //连接 Canal
-            connector.Connect();
-            //订阅，同时传入 Filter。Filter是一种过滤规则，通过该规则的表数据变更才会传递过来
-            //允许所有数据 .*\\..*
-            //允许某个库数据 库名\\..*
-            //允许某些表 库名.表名,库名.表名
-            connector.Subscribe(".*\\..*");
-            while (true)
-            {
-                //获取数据 1024表示数据大小 单位为字节
-                var message = connector.Get(1024);
-                //批次id 可用于回滚
-                var batchId = message.Id;
-                if (batchId == -1 || message.Entries.Count <= 0)
-                {
-                    Thread.Sleep(300);
-                    continue;
-                }
-
-                PrintEntry(message.Entries);
-            }
+            var conn = new SingleCanalConnector2("192.168.2.120", 11111, "", "", "example");
+            await conn.ConnectAsync();
+//            LogManager.Configuration = new XmlLoggingConfiguration("NLog.Config");
+//            //设置 NLog
+//            CanalSharpLogManager.LoggerFactory.AddNLog();
+//            _logger = CanalSharpLogManager.LoggerFactory.CreateLogger("Program");
+//            //canal 配置的 destination，默认为 example
+//            var destination = "example";
+//            //创建一个简单 CanalClient 连接对象（此对象不支持集群）传入参数分别为 canal 地址、端口、destination、用户名、密码
+//            var connector = CanalConnectorFactory.CreateSingleConnector("192.168.2.120", 11111, destination, "", "");
+//            //连接 Canal
+//            connector.Connect();
+//            //订阅，同时传入 Filter。Filter是一种过滤规则，通过该规则的表数据变更才会传递过来
+//            //允许所有数据 .*\\..*
+//            //允许某个库数据 库名\\..*
+//            //允许某些表 库名.表名,库名.表名
+//            connector.Subscribe(".*\\..*");
+//            while (true)
+//            {
+//                //获取数据 1024表示数据大小 单位为字节
+//                var message = connector.Get(1024);
+//                //批次id 可用于回滚
+//                var batchId = message.Id;
+//                if (batchId == -1 || message.Entries.Count <= 0)
+//                {
+//                    Thread.Sleep(300);
+//                    continue;
+//                }
+//            
+//                PrintEntry(message.Entries);
+//            }
+            Console.ReadKey();
         }
 
         /// <summary>
