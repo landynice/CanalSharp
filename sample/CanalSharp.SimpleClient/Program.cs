@@ -28,16 +28,17 @@ namespace CanalSharp.SimpleClient
 
         static async Task Main(string[] args)
         {
+
+            LogManager.Configuration = new XmlLoggingConfiguration("NLog.Config");
+            //设置 NLog
+            CanalSharpLogManager.LoggerFactory.AddNLog();
+            _logger = CanalSharpLogManager.LoggerFactory.CreateLogger("Program");
             var conn = new SingleCanalConnector2("192.168.157.132", 11111, "", "", "example");
+            conn.OnMessage += (sender, e) =>
+            {
+                PrintEntry(e.Data.Entries);
+            };
             await conn.ConnectAsync();
-//            while (true)
-//            {
-//                await conn.SendDataAsync(Encoding.UTF8.GetBytes(Console.ReadLine()));
-//            }
-//            LogManager.Configuration = new XmlLoggingConfiguration("NLog.Config");
-//            //设置 NLog
-//            CanalSharpLogManager.LoggerFactory.AddNLog();
-//            _logger = CanalSharpLogManager.LoggerFactory.CreateLogger("Program");
 //            //canal 配置的 destination，默认为 example
 //            var destination = "example";
 //            //创建一个简单 CanalClient 连接对象（此对象不支持集群）传入参数分别为 canal 地址、端口、destination、用户名、密码
@@ -65,6 +66,7 @@ namespace CanalSharp.SimpleClient
 //            }
             Console.ReadKey();
         }
+        
 
         /// <summary>
         /// 输出数据

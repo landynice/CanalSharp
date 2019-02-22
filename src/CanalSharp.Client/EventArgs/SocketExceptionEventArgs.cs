@@ -2,7 +2,7 @@
 
 namespace CanalSharp.Client.Socket
 {
-    public class ExceptionEventArgs:EventArgs
+    public class SocketExceptionEventArgs:EventArgs
     {
         public Exception Exception { get; set; }
     }

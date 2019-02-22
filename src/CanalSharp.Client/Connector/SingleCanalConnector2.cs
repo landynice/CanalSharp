@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using CanalSharp.Client.Socket;
 using CanalSharp.Common.Logging;
 using CanalSharp.Protocol;
@@ -39,6 +40,9 @@ namespace CanalSharp.Client.Connector
         private readonly ClientIdentity _clientIdentity;
 
         private List<Compression> _supportedCompressions = new List<Compression>();
+
+        // 是否自动化解析 Entry 对象, 如果考虑最大化性能可以延后解析
+        private bool _lazyParseEntry = false;
 
         /// <summary>
         /// Canal Server IP地址
@@ -74,6 +78,10 @@ namespace CanalSharp.Client.Connector
         public CanalConnectState ConnectState { get; private set; } = CanalConnectState.Init;
 
         private IChannel _channel;
+
+        public delegate void MessageHandler(object sender, CanalMessageEventArgs e);
+
+        public event MessageHandler OnMessage;
 
         public SingleCanalConnector2(string address, int port, string username, string password, string destination) :
             this(address, port, username, password, destination, 60000, 60 * 60 * 1000)
@@ -170,7 +178,7 @@ namespace CanalSharp.Client.Connector
             _channel = await bootstrap.ConnectAsync(new IPEndPoint(IPAddress.Parse(Address), Port));
         }
 
-        private async Task ProcessMessage(object sender, MessageEventArgs e)
+        private async Task ProcessMessage(object sender, SocketMessageEventArgs e)
         {
             Console.WriteLine("ProcessMessage");
             try
@@ -220,7 +228,7 @@ namespace CanalSharp.Client.Connector
                     throw new CanalClientException("expect handshake but found other type.");
                 }
             }
-            
+
             var ackBody = Protocol.Ack.Parser.ParseFrom(p.Body);
             if (ackBody.ErrorCode > 0)
             {
@@ -275,13 +283,48 @@ namespace CanalSharp.Client.Connector
         /// </summary>
         private async Task ProcessGetMessage(byte[] data)
         {
-            var packet = Packet.Parser.ParseFrom(data);
-            if (packet.Type != PacketType.Ack)
+            var p = Packet.Parser.ParseFrom(data);
+            switch (p.Type)
             {
-                throw new CanalClientException("unexpected packet type when ack is expected");
-            }
+                case PacketType.Messages:
+                {
+                    if (!p.Compression.Equals(Compression.None))
+                    {
+                        throw new CanalClientException("compression is not supported in this connector");
+                    }
 
-            ConnectState = CanalConnectState.Connected;
+                    var messages = Messages.Parser.ParseFrom(p.Body);
+                    var result = new Message(messages.BatchId);
+                    if (_lazyParseEntry)
+                    {
+                        // byteString
+                        result.RawEntries = messages.Messages_.ToList();
+                    }
+                    else
+                    {
+                        foreach (var byteString in messages.Messages_)
+                        {
+                            result.Entries.Add(Entry.Parser.ParseFrom(byteString));
+                        }
+                    }
+
+                    if (result.Id != -1 || result.Entries.Count > 0)
+                    {
+                        OnMessage(this, new CanalMessageEventArgs() {Data = result});
+                    }
+
+                    break;
+                }
+                case PacketType.Ack:
+                {
+                    var ack = Protocol.Ack.Parser.ParseFrom(p.Body);
+                    throw new CanalClientException($"something goes wrong with reason:{ack.ErrorMessage}");
+                }
+                default:
+                {
+                    throw new CanalClientException($"unexpected packet type: {p.Type}");
+                }
+            }
 
             await SendGetMessage();
         }

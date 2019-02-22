@@ -15,8 +15,8 @@ namespace CanalSharp.Client.Socket
     public class CanalSocketHandler: ChannelHandlerAdapter
     {
         public delegate void CommonHandler(object sender, EventArgs e);
-        public delegate Task MessageHandler(object sender, MessageEventArgs e);
-        public delegate void ExceptionHandler(object sender, ExceptionEventArgs e);
+        public delegate Task MessageHandler(object sender, SocketMessageEventArgs e);
+        public delegate void ExceptionHandler(object sender, SocketExceptionEventArgs e);
 
         public event CommonHandler OnConnected;
         public event MessageHandler OnMessage;
@@ -96,7 +96,7 @@ namespace CanalSharp.Client.Socket
             _pipeReader.Complete();
 
 
-            OnError?.Invoke(this,new ExceptionEventArgs(){Exception = exception});
+            OnError?.Invoke(this,new SocketExceptionEventArgs(){Exception = exception});
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace CanalSharp.Client.Socket
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private Task DefaultOnMessage(object sender, MessageEventArgs e)
+        private Task DefaultOnMessage(object sender, SocketMessageEventArgs e)
         {
             return Task.CompletedTask;
         }
@@ -119,30 +119,33 @@ namespace CanalSharp.Client.Socket
 
                 while (buffer.Length > ProtocolHeaderLength)
                 {
+                    //获取数据有效长度
                     var headerSequence = buffer.Slice(buffer.Start, ProtocolHeaderLength);
                     var headerBytes = headerSequence.ToArray();
                     Array.Reverse(headerBytes);
                     var dataLength = BitConverter.ToInt32(headerBytes, 0);
+                    //获取数据位置
                     var dataPosition = buffer.GetPosition(ProtocolHeaderLength);
-                    buffer = buffer.Slice(dataPosition);
+                    var dataBuffer = buffer.Slice(dataPosition);
 
-                    if (buffer.Length >= dataLength)
+                    if (dataBuffer.Length >= dataLength)
                     {
-                        var dataSequence = buffer.Slice(buffer.Start, dataLength);
+                        var dataSequence = dataBuffer.Slice(dataBuffer.Start, dataLength);
 
-                        await OnMessage(this, new MessageEventArgs() { Data = dataSequence.ToArray() });
+                        await OnMessage(this, new SocketMessageEventArgs() { Data = dataSequence.ToArray() });
 
-                        dataPosition = buffer.GetPosition(dataLength);
-                        buffer = buffer.Slice(dataPosition);
+                        //移动指针到已经读取的数据
+                        dataPosition = dataBuffer.GetPosition(dataLength);
+                        buffer = dataBuffer.Slice(dataPosition);
                     }
                     else
                     {
                         break;
                     }
 
-                    _pipeReader.AdvanceTo(buffer.Start, buffer.End);
                 }
 
+                _pipeReader.AdvanceTo(buffer.Start);
 
                 if (result.IsCompleted)
                 {

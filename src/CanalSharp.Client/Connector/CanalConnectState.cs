@@ -5,6 +5,6 @@
         Init = 0,
         Handshake,
         Connected,
-        Subscribe,
+        Subscribe
     }
 }

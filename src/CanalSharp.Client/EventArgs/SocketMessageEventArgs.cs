@@ -2,7 +2,7 @@
 
 namespace CanalSharp.Client.Socket
 {
-    public class MessageEventArgs : EventArgs
+    public class SocketMessageEventArgs : EventArgs
     {
         public byte[] Data { get; set; }
     }
