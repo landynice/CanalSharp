@@ -14,12 +14,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Microsoft.Extensions.Logging;
 
 namespace CanalSharp.Common.Logging
 {
     public static class CanalSharpLogManager
     {
-        public static readonly ILoggerFactory LoggerFactory = new LoggerFactory();
+        public static ILoggerFactory LoggerFactory { get; private set; } = new LoggerFactory();
+
+        public static void SetLoggerFactory(ILoggerFactory factory)
+        {
+            LoggerFactory = factory ?? throw new ArgumentException(nameof(factory));
+        }
+
+        public static ILogger CreateLogger(Type type)
+        {
+            return LoggerFactory.CreateLogger(type);
+        }
+
+        public static ILogger CreateLogger<T>()
+        {
+            return LoggerFactory.CreateLogger<T>();
+        }
     }
 }
