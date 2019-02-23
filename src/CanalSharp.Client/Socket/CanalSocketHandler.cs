@@ -14,7 +14,8 @@ namespace CanalSharp.Client.Socket
     public class CanalSocketHandler : ChannelHandlerAdapter
     {
 
-        public delegate Task MessageHandler(object sender, SocketMessageEventArgs e);
+        public delegate Task MessageHandler(ChannelHandlerAdapter sender, byte[] data);
+        public delegate Task ExceptionHandler(ChannelHandlerAdapter sender, Exception e);
 
         /// <summary>
         ///     数据包头部表示有效数据长度的字节长度 即前4个字节表示有效数据长度
@@ -35,6 +36,7 @@ namespace CanalSharp.Client.Socket
         }
         
         public event MessageHandler OnMessage;
+        public event ExceptionHandler OnException;
 
         /// <summary>
         /// 读数据
@@ -76,6 +78,7 @@ namespace CanalSharp.Client.Socket
         public override void ExceptionCaught(IChannelHandlerContext context, Exception exception)
         {
             _logger.LogError(exception,"Handler error.");
+            OnException?.Invoke(this,exception);
         }
 
         public override async Task CloseAsync(IChannelHandlerContext context)
@@ -110,7 +113,7 @@ namespace CanalSharp.Client.Socket
                         var dataSequence = dataBuffer.Slice(dataBuffer.Start, dataLength);
 
                         if (OnMessage != null)
-                            await OnMessage(this, new SocketMessageEventArgs {Data = dataSequence.ToArray()});
+                            await OnMessage(this, dataSequence.ToArray());
 
                         //移动指针到已经读取的数据
                         dataPosition = dataBuffer.GetPosition(dataLength);

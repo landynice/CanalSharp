@@ -45,7 +45,7 @@ namespace CanalSharp.Client.Connector
         private readonly ClientIdentity _clientIdentity;
         private readonly SingleConnectorOptions _options;
         private readonly List<Compression> _supportedCompressions;
-        private readonly SingleThreadEventLoop _nettyGroup;
+        private readonly MultithreadEventLoopGroup _nettyGroup;
 
 
         private IChannel _channel;
@@ -56,11 +56,15 @@ namespace CanalSharp.Client.Connector
         private const int EmptySleep=1000;
         public ConnectState ConnectState { get; private set; }
 
-        public delegate void MessageHandler(object sender, CanalMessageEventArgs e);
-        public delegate void CommonHandler(object sender, EventArgs e);
+        public delegate void MessageHandler(EventSingleConnector sender, Message data);
+        public delegate void CommonHandler(EventSingleConnector sender);
 
         public event MessageHandler OnMessage;
         public event CommonHandler OnReady;
+
+        //Exit application signal
+        private bool _stopRunning = false;
+        private bool _handling = false;
 
         /// <summary>
         /// Create instance.
@@ -77,7 +81,7 @@ namespace CanalSharp.Client.Connector
         public EventSingleConnector(SingleConnectorOptions options)
         {
             _options = options;
-            _nettyGroup = new SingleThreadEventLoop();
+            _nettyGroup = new MultithreadEventLoopGroup();
             _clientIdentity = new ClientIdentity(options.Destination, _options.ClientId,options.Filter);
             _logger = CanalSharpLogManager.CreateLogger<EventSingleConnector>();
             _supportedCompressions = new List<Compression>(){Compression.None};
@@ -99,6 +103,11 @@ namespace CanalSharp.Client.Connector
             {
                 var handler = new CanalSocketHandler();
                 handler.OnMessage += ProcessMessage;
+                handler.OnException += (sender, ex) => {
+                    _logger.LogError(ex, "Socke error.");
+                    return Task.CompletedTask;
+                };
+
                 var bootstrap = new Bootstrap();
                 bootstrap
                     .Group(_nettyGroup)
@@ -128,6 +137,14 @@ namespace CanalSharp.Client.Connector
                 return;
             }
 
+            //set exit application signal
+            _stopRunning = true;
+            //wait for working
+            while (_handling)
+            {
+                await Task.Delay(100);
+            }
+
             if (_channel != null)
             {
                 await _channel.DisconnectAsync();
@@ -139,6 +156,8 @@ namespace CanalSharp.Client.Connector
             ConnectState = ConnectState.Init;
 
             _logger.LogInformation("Close the connection successfully");
+            _stopRunning = false;
+            _handling = false;
         }
 
         /// <summary>
@@ -163,7 +182,7 @@ namespace CanalSharp.Client.Connector
 
             _options.Filter = filter;
             _clientIdentity.Filter = filter;
-            await SendSubscribe();
+            await SendSubscribeAsync();
         }
 
 
@@ -218,48 +237,67 @@ namespace CanalSharp.Client.Connector
 
         #region Process packets
 
-        private async Task ProcessMessage(object sender, SocketMessageEventArgs e)
+        private async Task ProcessMessage(ChannelHandlerAdapter sender,byte[] data)
         {
             try
             {
+                _handling = true;
                 switch (ConnectState)
                 {
                     case ConnectState.Init:
-                        await ProcessInitAsync(e.Data);
+                        await ProcessInitAsync(data);
                         break;
                     case ConnectState.Handshake:
-                        await ProcessHandshakeAsync(e.Data);
+                        await ProcessHandshakeAsync(data);
                         break;
                     case ConnectState.Connected:
-                        await ProcessSubscribeAsync(e.Data);
+                        await ProcessSubscribeAsync(data);
                         break;
                     case ConnectState.Subscribe:
-                        await ProcessReceiveMessage(e.Data);
+                        await ProcessReceiveMessage(data);
                         break;
                     default:
                         throw new CanalProtocolException("Unexpected Packets.");
                 }
+
                 _errorCount = 0;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while processing the data package.");
                 _errorCount++;
                 if (ex is CanalConnectException)
                 {
+                    _logger.LogError(ex,
+                        "Exceptions occurred during connection and the program could not continue to run.");
+                    await CloseAsync();
+                    throw;
+                }
+
+                if (ex is ClosedChannelException)
+                {
+                    _logger.LogError(ex, "Connection interruption due to exceptions.");
+                    await CloseAsync();
                     throw;
                 }
                 else
                 {
-                    if(_errorCount>= MaxErrorCount)
+                    _logger.LogError(ex, "An error occurred while processing the data package.");
+
+                    if (_errorCount >= MaxErrorCount)
                     {
-                        throw new CanalException($"The number of errors has reached the threshold {MaxErrorCount} and get data is stopped.");
+                        await CloseAsync();
+                        throw new CanalException(
+                            $"The number of errors has reached the threshold {MaxErrorCount} and get data is stopped. Application Exit!");
                     }
-                    else if(ConnectState==ConnectState.Subscribe)
+                    else if (ConnectState == ConnectState.Subscribe)
                     {
-                        await SendGetMessage();
+                        await SendGetMessageAsync();
                     }
                 }
+            }
+            finally
+            {
+                _handling = false;
             }
         }
 
@@ -289,7 +327,7 @@ namespace CanalSharp.Client.Connector
 
             ConnectState = ConnectState.Handshake;
 
-            await SendHandshake();
+            await SendHandshakeAsync();
         }
 
         /// <summary>
@@ -304,7 +342,7 @@ namespace CanalSharp.Client.Connector
 
             ConnectState = ConnectState.Connected;
 
-            await SendSubscribe();
+            await SendSubscribeAsync();
         }
 
         /// <summary>
@@ -319,10 +357,10 @@ namespace CanalSharp.Client.Connector
             if (ack.ErrorCode > 0) throw new CanalConnectException($"Failed to subscribe with reason: {ack.ErrorMessage}");
 
             ConnectState = ConnectState.Subscribe;
-            OnReady?.Invoke(this,new EventArgs());
+            OnReady?.Invoke(this);
 
             _logger.LogInformation($"Subscribe to [{_options.Filter}]");
-            await SendGetMessage();
+            await SendGetMessageAsync();
         }
 
         /// <summary>
@@ -350,12 +388,13 @@ namespace CanalSharp.Client.Connector
                     if (result.Id != -1 || result.Entries.Count > 0)
                     {
                         _emptyCount = 0;
-                        OnMessage(this, new CanalMessageEventArgs { Data = result });
+                        OnMessage?.Invoke(this, result);
                     }
                     else
                     {
                         if (_emptyCount >= MaxEmptyCount)
                         {
+                            _logger.LogDebug($"No data has been obtained in the last {MaxEmptyCount} requests, the program will enter a low consumption mode.");
                             await Task.Delay(EmptySleep);
                         }
                         else
@@ -379,7 +418,7 @@ namespace CanalSharp.Client.Connector
                 }
             }
 
-            await SendGetMessage();
+            await SendGetMessageAsync();
         }
 
         #endregion
@@ -390,20 +429,15 @@ namespace CanalSharp.Client.Connector
         /// Send handshake packet
         /// </summary>
         /// <returns></returns>
-        private async Task SendHandshake()
+        private async Task SendHandshakeAsync()
         {
-            var timeout = _options.SoTimeOut / 1000;
-            if (timeout == 0)
-            {
-                timeout = 10;
-            }
 
             var ca = new ClientAuth
             {
                 Username = _options.Username ?? "",
                 Password = ByteString.CopyFromUtf8(_options.Password ?? ""),
-                NetReadTimeout = timeout,
-                NetWriteTimeout = timeout
+                NetReadTimeout = _options.SoTimeOut,
+                NetWriteTimeout = _options.SoTimeOut
             };
 
             var packet = new Packet
@@ -419,7 +453,7 @@ namespace CanalSharp.Client.Connector
         /// Send subscribe packet
         /// </summary>
         /// <returns></returns>
-        private async Task SendSubscribe()
+        private async Task SendSubscribeAsync()
         {
             var sub = new Sub
             {
@@ -440,17 +474,16 @@ namespace CanalSharp.Client.Connector
         /// Send get message packet
         /// </summary>
         /// <returns></returns>
-        private async Task SendGetMessage()
+        private async Task SendGetMessageAsync()
         {
             var get = new Get
             {
-//                AutoAck = _options.AutoAck,
-                AutoAck = false,
+                AutoAck = _options.AutoAck,
                 Destination = _options.Destination,
                 ClientId = _options.ClientId.ToString(),
                 FetchSize = _options.BitchSize,
                 Timeout = _options.ReceiveMesageTimeOut,
-                Unit = _options.ReceiveMesageTimeOut
+                Unit = _options.ReceiveMesageUnit
             };
             var packet = new Packet
             {
@@ -464,21 +497,19 @@ namespace CanalSharp.Client.Connector
         /// Send packets
         /// </summary>
         /// <param name="body"></param>
-        public async Task SendPacketAsync(byte[] body)
+        private async Task SendPacketAsync(byte[] body)
         {
-            try
+            if (_stopRunning)
             {
-                var headerBytes = BitConverter.GetBytes(body.Length);
-                Array.Reverse(headerBytes);
-                var msg = Unpooled.Buffer(body.Length + headerBytes.Length);
-                msg.WriteBytes(headerBytes);
-                msg.WriteBytes(body);
-                await _channel.WriteAndFlushAsync(msg);
+                return;
             }
-            catch (Exception e)
-            {
-                throw new CanalProtocolException("Failed to send packet", e);
-            }
+
+            var headerBytes = BitConverter.GetBytes(body.Length);
+            Array.Reverse(headerBytes);
+            var msg = Unpooled.Buffer(body.Length + headerBytes.Length);
+            msg.WriteBytes(headerBytes);
+            msg.WriteBytes(body);
+            await _channel.WriteAndFlushAsync(msg);
         }
 
         #endregion
