@@ -104,7 +104,7 @@ namespace CanalSharp.Client.Connector
                 var handler = new CanalSocketHandler();
                 handler.OnMessage += ProcessMessage;
                 handler.OnException += (sender, ex) => {
-                    _logger.LogError(ex, "Socke error.");
+                    _logger.LogError(ex, "Socket error.");
                     return Task.CompletedTask;
                 };
 

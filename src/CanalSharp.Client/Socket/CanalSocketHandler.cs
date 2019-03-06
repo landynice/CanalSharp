@@ -18,7 +18,7 @@ namespace CanalSharp.Client.Socket
         public delegate Task ExceptionHandler(ChannelHandlerAdapter sender, Exception e);
 
         /// <summary>
-        ///     数据包头部表示有效数据长度的字节长度 即前4个字节表示有效数据长度
+        /// 数据包头部表示有效数据长度的字节长度 即前4个字节表示有效数据长度
         /// </summary>
         private const int ProtocolHeaderLength = 4;
 
